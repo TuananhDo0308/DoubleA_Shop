@@ -1,23 +1,16 @@
-import { Header } from "@/sections/Header";
+import { Navbar } from "@/sections/Header";
+import { ListProducts } from "@/sections/ListProducts";
 import { Hero } from "@/sections/Hero";
 import { LogoTicker } from "@/sections/LogoTicker";
-import { ProductShowcase } from "@/sections/ProductShowcase";
-import { Pricing } from "@/sections/Pricing";
-import { Testimonials } from "@/sections/Testimonials";
-import { CallToAction } from "@/sections/CallToAction";
-import { Footer } from "@/sections/Footer";
-
+import { SwipeCarousel } from "@/sections/Carousel";
 export default function Home() {
   return (
     <>
-      <Header />
+      <Navbar />
       <Hero />
       <LogoTicker />
-      <ProductShowcase />
-      <Pricing />
-      <Testimonials />
-      <CallToAction />
-      <Footer />
+      <SwipeCarousel/>
+      <ListProducts />
     </>
   );
 }
