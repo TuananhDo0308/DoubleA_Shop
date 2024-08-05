@@ -51,7 +51,7 @@ export const SwipeCarousel = () => {
   };
 
   return (
-    <div className="relative overflow-hidden py-8">
+    <div className="relative overflow-hidden px-28 py-8">
       <motion.div
         drag="x"
         dragConstraints={{
@@ -88,13 +88,13 @@ const Images = ({ imgIndex }) => {
               backgroundImage: `url(${imgSrc.src})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: '500px', // đặt chiều cao cố định
+              height: '600px', // đặt chiều cao cố định
             }}
             animate={{
               scale: imgIndex === idx ? 0.95 : 0.85,
             }}
             transition={SPRING_OPTIONS}
-            className="shrink-0 rounded-xl w-screen bg-neutral-800 object-cover"
+            className="shrink-0 rounded-xl w-[calc(100vw-224px)]  bg-neutral-800 object-cover"
           />
         );
       })}
@@ -112,7 +112,7 @@ const Dots = ({ imgIndex, setImgIndex }) => {
             key={idx}
             onClick={() => setImgIndex(idx)}
             className={`h-3 w-3 rounded-full transition-colors ${
-              idx === imgIndex ? "bg-neutral-50" : "bg-neutral-500"
+              idx === imgIndex ? "bg-blue-600" : "bg-neutral-500"
             }`}
           />
         );

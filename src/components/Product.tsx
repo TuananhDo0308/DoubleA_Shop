@@ -38,8 +38,8 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
 
 const DottedButton = () => {
   return (
-    <button className="rounded-2xl mt-2 border-2 border-dashed border-black bg-white px-4 py-2 font-semibold  text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none">
-      Add to cart
+    <button className="rounded-2xl mt-2 border-black bg-white px-4 py-2 font-semibold  text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none">
+      Add
     </button>
   );
 };
@@ -92,7 +92,7 @@ const TiltCard = ({ imageSrc, altText }) => {
         width: "100%", // Đặt chiều rộng 100%
         height:"300px"
       }}
-      className="relative rounded-xl bg-gradient-to-br from-indigo-300 to-violet-300"
+      className="relative rounded-xl bg-gradient-to-br from-blue-500 to-blue-600"
     >
       <div
         style={{

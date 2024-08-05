@@ -104,7 +104,7 @@ const Chip = ({ text, selected, setSelectedCategory }) => {
         <motion.span
           layoutId="pill-tab"
           transition={{ type: "spring", duration: 0.5 }}
-          className="absolute inset-0 z-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-md"
+          className="absolute inset-0 z-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md"
         ></motion.span>
       )}
     </button>

@@ -4,14 +4,14 @@
 
 @layer components{
     .btn{
-        @apply bg-black text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center tracking-tight;
+        @apply bg-black text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center tracking-tight 
     }
     .btn-primary{
-        @apply bg-black text-white;
+        @apply bg-black text-white hover:bg-slate-800;
         
     }
     .btn-text{
-        @apply text-black bg-transparent;
+        @apply text-black bg-transparent hover:text-white transition-all duration-300;
     }
     .logo-ticker-image{
         @apply h-8 w-auto;
