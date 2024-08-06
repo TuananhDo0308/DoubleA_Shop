@@ -1,10 +1,15 @@
+"use client"
 import Image from "next/image";
 import Logo from "@/assets/logo.png";
 import { AnimatedHamburgerButton } from "../components/MenuButton";
-import Link from 'next/link';
-import SignIn from "./SignIn";
-
+import { useRouter } from 'next/navigation';
 export const Navbar = () => {
+  const router = useRouter();
+
+  const handleSignInClick = () => {
+    router.push('/SignIn');
+  };
+
   return (
     <header className="sticky top-0 backdrop-blur-sm z-20">
       <div className="py-5">
@@ -17,9 +22,9 @@ export const Navbar = () => {
             <button className="topNav">Home</button>
             <button className="topNav">Shop</button>
             <button className="topNav">About</button>
-            <Link href="/src/assets/SignIn">
-              <p className="bg-black text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center tracking-tight">Sign In</p>
-            </Link>
+            <button className="bg-black text-white px-4 py-2 rounded-lg font-medium inline-block" onClick={handleSignInClick}>
+              Sign In
+            </button>
           </nav>
         </div>
       </div>
