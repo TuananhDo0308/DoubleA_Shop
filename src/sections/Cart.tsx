@@ -112,11 +112,14 @@ export const DragCloseDrawerExample = () => {
                   key={product.id}
                   className="justify-between mb-6 rounded-lg bg-white p-6 shadow-md sm:flex sm:justify-start"
                 >
-                  <Image
-                    src={product.image}
-                    alt="product-image"
-                    className="w-full rounded-lg sm:w-40"
-                  />
+                  <div className="relative w-full h-60 sm:w-40 sm:h-40">
+                    <Image
+                      src={product.image}
+                      alt="product-image"
+                      className="object-cover rounded-lg"
+                      layout="fill"
+                    />
+                  </div>
                   <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                     <div className="mt-5 sm:mt-0">
                       <h2 className="text-lg font-bold text-gray-900">
