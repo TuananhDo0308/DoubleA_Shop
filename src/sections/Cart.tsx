@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useMeasure } from "@react-hookz/web";
 import {
   useDragControls,
@@ -91,6 +92,11 @@ export const DragCloseDrawerExample = () => {
     0
   );
 
+  const router = useRouter();
+
+  const handleSignInClick = () => {
+    router.push('/Checkout');
+  };
   const total = subtotal + shippingCost + subtotal * vatRate;
 
   return (
@@ -189,7 +195,7 @@ export const DragCloseDrawerExample = () => {
                   <p className="text-sm text-gray-700">including VAT</p>
                 </div>
               </div>
-              <button className="mt-6 w-full rounded-md bg-blue-500 py-1.5 font-medium text-blue-50 hover:bg-blue-600">
+              <button className="mt-6 w-full rounded-md bg-blue-500 py-1.5 font-medium text-blue-50 hover:bg-blue-600" onClick={handleSignInClick}>
                 Check out
               </button>
             </div>
