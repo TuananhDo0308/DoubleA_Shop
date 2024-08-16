@@ -24,7 +24,7 @@ export const Hero = () => {
 
       <div className="md:flex items-center" style={{ height: 'calc(100vh - 120px)' }}>
         <div className="md:w-[478px]  ">
-          <div className="text-sm inline-flex border border-[#222]/10 px-3 rounded-lg tracking-tight mt-10">Version2.0 here</div>
+          <div className="text-sm inline-flex border border-[#222]/10 px-3 rounded-lg tracking-tight mt-10">Xin chao VietNam</div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-gradient-to-b from-black to-[#001E80] text-transparent bg-clip-text mt-6">
             Welcome to DoubleA shop
           </h1>
@@ -71,8 +71,8 @@ export const Hero = () => {
           <motion.img
             src={noodleImage.src}
             alt="noodle"
-            width={220}
-            className="hidden lg:block absolute top-[500px] left-[448px] rotate-[30deg]"
+            width={250}
+            className="hidden lg:block absolute top-[450px] left-[448px] rotate-[30deg]"
             style={{
               rotate:0,
               translateY:translateY,
