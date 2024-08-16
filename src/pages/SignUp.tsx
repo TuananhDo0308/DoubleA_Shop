@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Image from "next/image";
 import defaultImage from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"; // Import the default image
+import { registerUser } from "@/services/signUpAPI";
 
 
 const SignUp = () => {
@@ -19,7 +20,7 @@ const SignUp = () => {
 
   const stepTwoSchema = yup.object().shape({
     address: yup.string().required("Address is required"),
-    phone: yup.string().required("Phone number is required"),
+    phone: yup.string().required("Phone number is required").length(10, "Phone number must be 10 digits"),
   });
 
   const stepThreeSchema = yup.object().shape({
@@ -46,9 +47,27 @@ const SignUp = () => {
 
   const { handleSubmit, trigger } = methods;
 
-  const onSubmit = (data) => {
-    console.log("Final Data:", data);
-    // Handle final submission logic here
+  const onSubmit = async (data) => {
+    try{
+      // const response = await registerUser(data);
+      const formData = new FormData();
+      formData.append("firstName", data.firstName);
+      formData.append("lastName", data.lastName);
+      formData.append("dob", data.dob);
+      formData.append("gender", data.gender);
+      formData.append("address", data.address);
+      formData.append("phone", data.phone);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("profilePicture", data.profilePicture); // Thêm file ảnh vào form
+
+    const response = await registerUser(formData); // Gửi FormData
+      console.log("Final Data:", response);
+      window.location.href='/'
+    }catch (error) {
+      console.error(error);
+      alert(error.message || "Đã xảy ra lỗi khi tạo tài khoản");
+  }
   };
 
   const nextStep = async () => {
@@ -61,9 +80,18 @@ const SignUp = () => {
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-cover bg-center" 
-      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')" }}>
-      <div className="w-[650px] bg-white flex justify-center items-center shadow-lg h-auto py-10 rounded-lg">
+    <div className="relative min-h-screen flex justify-center items-center">
+      {/* Blurred Background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center filter blur-md"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1614738149154-d6c9f6668b34?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          zIndex: -1,
+        }}
+      ></div>
+
+      {/* Content Container */}
+      <div className="w-[650px] bg-white flex justify-center items-center shadow-lg h-auto py-10 rounded-2xl z-10">
         <div className="w-full max-w-md">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -72,13 +100,41 @@ const SignUp = () => {
               {currentStep === 2 && <StepThree />}
               {currentStep === 3 && <StepFour />}
               <div className="flex justify-between mt-6">
-                {currentStep > 0 && <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-300 rounded">Previous</button>}
-                {currentStep < 3 && <button type="button" onClick={nextStep} className="px-4 py-2 bg-blue-500 text-white rounded">Next</button>}
-                {currentStep === 3 && <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Sign up</button>}
+                {currentStep > 0 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-4 py-2 bg-gray-300 rounded"
+                  >
+                    Previous
+                  </button>
+                )}
+                {currentStep < 3 && (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Next
+                  </button>
+                )}
+                {currentStep === 3 && (
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Sign up
+                  </button>
+                )}
               </div>
             </form>
           </FormProvider>
         </div>
+      </div>
+
+      {/* Logo in the bottom-right corner */}
+      <div className="absolute bottom-4 right-4">
+        <img src="/path-to-your-logo.png" alt="Logo" className="w-24 h-auto" />
       </div>
     </div>
   );
@@ -221,7 +277,9 @@ const StepFour = () => {
   
     const profilePicture = watch("profilePicture");
     const handleProfilePictureChange = (e) => {
-      setValue("profilePicture", e.target.files[0]);
+      const file = e.target.files[0];
+      console.log("Selected File: ", file); // Kiểm tra định dạng file
+      setValue("profilePicture", file);
     };
   
     return (

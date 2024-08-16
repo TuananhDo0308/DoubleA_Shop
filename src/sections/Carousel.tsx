@@ -52,6 +52,7 @@ export const SwipeCarousel = () => {
 
   return (
     <div className="relative overflow-hidden px-28 py-8">
+      
       <motion.div
         drag="x"
         dragConstraints={{
@@ -88,7 +89,7 @@ const Images = ({ imgIndex }) => {
               backgroundImage: `url(${imgSrc.src})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: '600px', // đặt chiều cao cố định
+              height: '300px', // đặt chiều cao cố định
             }}
             animate={{
               scale: imgIndex === idx ? 0.95 : 0.85,

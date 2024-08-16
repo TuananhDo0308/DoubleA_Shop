@@ -10,94 +10,68 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import Icon from "@/assets/BagIcon.png";
-import appleImg from "@/assets/products/Fruits/apple.jpg";
-import kiwiImg from "@/assets/products/Fruits/kiwi.jpg";
-import orangeImg from "@/assets/products/Fruits/orange.jpg";
-import strawberryImg from "@/assets/products/Fruits/Straw.jpg";
-import watermelonImg from "@/assets/products/Fruits/watermelom.jpg";
-import matchaImg from "@/assets/products/Tea/MATCHA.jpg";
-
-export const DragCloseDrawerExample = () => {
+import { useAuth } from "@/context/AuthContext";
+import { removeItems } from "@/services/cartAPI";
+import { updateCart } from "@/services/cartAPI";
+export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
+  const { user, cart, setCart } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const products = [
-    {
-      id: 1,
-      name: 'Apple Juice',
-      price: 5000,
-      image: appleImg,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: 'Kiwi Juice',
-      price: 6000,
-      image: kiwiImg,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      name: 'Orange Juice',
-      price: 4000,
-      image: orangeImg,
-      quantity: 1,
-    },
-    {
-      id: 4,
-      name: 'Strawberry Smoothie',
-      price: 8000,
-      image: strawberryImg,
-      quantity: 1,
-    },
-    {
-      id: 5,
-      name: 'Watermelon Juice',
-      price: 3000,
-      image: watermelonImg,
-      quantity: 1,
-    },
-    {
-      id: 6,
-      name: 'Matcha Latte',
-      price: 5000,
-      image: matchaImg,
-      quantity: 1,
-    },
-  ];
-
-  const [cartProducts, setCartProducts] = useState(products);
-
-  const shippingCost = 49900;
   const vatRate = 0.1; // 10%
-
-  const handleQuantityChange = (id, delta) => {
-    setCartProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id
-          ? {
-              ...product,
-              quantity: Math.max(1, product.quantity + delta),
-            }
-          : product
-      )
+  const handleQuantityChange = async (id, delta) => {
+    const updatedCart = cart.map((product) =>
+      product.str_masp === id
+        ? { ...product, i_so_luong: Math.max(1, product.i_so_luong + delta) }
+        : product
     );
+
+    try {
+      await updateQuantityDB(id, updatedCart.find(product => product.str_masp === id).i_so_luong); // Gọi hàm async với await
+      setCart(updatedCart); // Cập nhật cart sau khi cập nhật thành công trong DB
+    } catch (error) {
+      console.error('Error updating cart quantity:', error);
+      alert('Failed to update product quantity. Please try again.');
+    }
+};
+
+  
+  const updateQuantityDB = async (id, soluong) => {
+    try {
+      const response = await updateCart(user.str_mand, id, soluong); // Chuyển số lượng vào đây
+      return response.data; // Trả về dữ liệu nếu cần
+    } catch (error) {
+      console.error('Error updating quantity in DB:', error);
+      throw error; // Ném lỗi để hàm gọi có thể xử lý
+    }
+  };
+  
+
+  const handleRemoveProduct = async (id) => {
+    
+    // // Update the cart stored in AuthContext by filtering out the product
+    // const updatedCart = cart.filter((product) => product.str_masp !== id);
+    
+    // setCart(updatedCart); // Update the cart in AuthContext
+    try {
+      const response = await removeItems(user.str_mand,id);
+      // Update the cart stored in AuthContext by filtering out the product
+      const updatedCart = cart.filter((product) => product.str_masp !== id);
+    
+    setCart(updatedCart); // Update the cart in AuthContext
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Remove failed!");
+    }
   };
 
-  const handleRemoveProduct = (id) => {
-    setCartProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
-  };
-
-  const subtotal = cartProducts.reduce(
-    (acc, product) => acc + product.price * product.quantity,
+  const subtotal = cart.reduce(
+    (acc, product) => acc + product.d_don_gia * product.i_so_luong,
     0
   );
 
-  const router = useRouter();
+  const total = subtotal + subtotal * vatRate;
 
-  const handleSignInClick = () => {
-    router.push('/Checkout');
-  };
-  const total = subtotal + shippingCost + subtotal * vatRate;
+  if (!user) return null; // If not logged in, don't display the cart button
 
   return (
     <div className="absolute h-screen z-50">
@@ -113,15 +87,15 @@ export const DragCloseDrawerExample = () => {
           <h1 className="mb-10 text-center text-2xl font-bold">Cart Items</h1>
           <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0">
             <div className="rounded-lg md:w-2/3">
-              {cartProducts.map((product) => (
+              {cart.map((product) => (
                 <div
-                  key={product.id}
+                  key={product.str_masp}
                   className="justify-between mb-6 rounded-lg bg-white p-6 shadow-md sm:flex sm:justify-start"
                 >
                   <div className="relative w-full h-60 sm:w-40 sm:h-40">
                     <Image
-                      src={product.image}
-                      alt="product-image"
+                      src={`/path/to/your/image/${product.str_masp}.jpg`} // Replace with correct image path
+                      alt={product.str_tensp}
                       className="object-cover rounded-lg"
                       layout="fill"
                     />
@@ -129,32 +103,38 @@ export const DragCloseDrawerExample = () => {
                   <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                     <div className="mt-5 sm:mt-0">
                       <h2 className="text-lg font-bold text-gray-900">
-                        {product.name}
+                        {product.str_tensp}
                       </h2>
                     </div>
                     <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block sm:space-x-6">
                       <div className="flex items-center border-gray-100">
                         <span
                           className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"
-                          onClick={() => handleQuantityChange(product.id, -1)}
+                          onClick={() =>
+                            handleQuantityChange(product.str_masp, -1)
+                          }
                         >
                           -
                         </span>
                         <input
                           className="h-8 w-8 border bg-white text-center text-xs outline-none"
                           type="number"
-                          value={product.quantity}
+                          value={product.i_so_luong}
                           readOnly
                         />
                         <span
                           className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"
-                          onClick={() => handleQuantityChange(product.id, 1)}
+                          onClick={() =>
+                            handleQuantityChange(product.str_masp, 1)
+                          }
                         >
                           +
                         </span>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <p className="text-sm">{product.price.toLocaleString()} ₭</p>
+                        <p className="text-sm">
+                          {product.d_don_gia.toLocaleString()} $
+                        </p>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -162,7 +142,7 @@ export const DragCloseDrawerExample = () => {
                           strokeWidth="1.5"
                           stroke="currentColor"
                           className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                          onClick={() => handleRemoveProduct(product.id)}
+                          onClick={() => handleRemoveProduct(product.str_masp)}
                         >
                           <path
                             strokeLinecap="round"
@@ -179,25 +159,34 @@ export const DragCloseDrawerExample = () => {
             <div className="mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-1/3">
               <div className="mb-2 flex justify-between">
                 <p className="text-gray-700">Subtotal</p>
-                <p className="text-gray-700">{subtotal.toLocaleString()} ₭</p>
+                <p className="text-gray-700">{subtotal.toLocaleString()} $</p>
               </div>
               <div className="flex justify-between">
-                <p className="text-gray-700">Shipping</p>
-                <p className="text-gray-700">{shippingCost.toLocaleString()} ₭</p>
+                <p className="text-gray-700">VAT</p>
+                <p className="text-gray-700">{(vatRate * 100).toLocaleString()} %</p>
               </div>
               <hr className="my-4" />
               <div className="flex justify-between">
                 <p className="text-lg font-bold">Total</p>
                 <div>
                   <p className="mb-1 text-lg font-bold">
-                    {total.toLocaleString()} ₭
+                    {total.toLocaleString()} $
                   </p>
                   <p className="text-sm text-gray-700">including VAT</p>
                 </div>
               </div>
-              <button className="mt-6 w-full rounded-md bg-blue-500 py-1.5 font-medium text-blue-50 hover:bg-blue-600" onClick={handleSignInClick}>
+              <button
+                onClick={onCheckoutClick}
+                className={`mt-6 w-full rounded-md py-1.5 font-medium text-blue-50 transition-all duration-300 ${
+                  cart.length > 0
+                    ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+                disabled={cart.length === 0} // Disable button if cart is empty
+              >
                 Check out
               </button>
+
             </div>
           </div>
         </div>

@@ -1,98 +1,81 @@
 "use client";
-import appleImg from "@/assets/products/Fruits/apple.jpg";
-import kiwiImg from "@/assets/products/Fruits/kiwi.jpg";
-import orangeImg from "@/assets/products/Fruits/orange.jpg";
-import strawberryImg from "@/assets/products/Fruits/Straw.jpg";
-import watermelonImg from "@/assets/products/Fruits/watermelom.jpg";
-import matchaImg from "@/assets/products/Tea/MATCHA.jpg";
 import { Product } from "@/components/Product";
 import { motion } from "framer-motion";
-import { useState } from "react";
-export const ListProducts = () => {
-  const products = [
-    {
-      id: 1,
-      name: 'Apple Juice',
-      image: appleImg,
-      price: '5.00$',
-      category: 'Juice',
-    },
-    {
-      id: 2,
-      name: 'Kiwi Juice',
-      image: kiwiImg,
-      price: '6.00$',
-      category: 'Juice',
-    },
-    {
-      id: 3,
-      name: 'Orange Juice',
-      image: orangeImg,
-      price: '4.00$',
-      category: 'Juice',
-    },
-    {
-      id: 4,
-      name: 'Strawberry Smoothie',
-      image: strawberryImg,
-      price: '8.00$',
-      category: 'Smoothie',
-    },
-    {
-      id: 5,
-      name: 'Watermelon Juice',
-      image: watermelonImg,
-      price: '3.00$',
-      category: 'Juice',
-    },
-    {
-      id: 6,
-      name: 'Matcha Latte',
-      image: matchaImg,
-      price: '5.00$',
-      category: 'Tea',
-    },
-  ];
+import { getCategories } from "@/services/categoryAPI";
+import { getProducts } from "@/services/productAPI";
+import { Category } from "@/types/Category";
+import { ProductType } from "@/types/Product";
+import { useEffect, useState } from "react";
 
-  const [selectedCategory, setSelectedCategory] = useState('All');
+export const ListProducts = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts();
+  }, []);
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      console.log("product",data.list);
+      setProducts(data.list);  
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      console.log('Fetched categories:', data.list);
+      setCategories([{ str_malh: 'All', str_tenlh: 'All' }, ...data.list]);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const filteredProducts = selectedCategory === 'All'
     ? products
-    : products.filter(product => product.category === selectedCategory);
+    : products.filter(product => product.str_malh === selectedCategory);
 
   return (
     <div>
-      <ChipTabs selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <ChipTabs 
+        categories={categories} 
+        selectedCategory={selectedCategory} 
+        setSelectedCategory={setSelectedCategory} 
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 sm:grid-cols-1 lg:grid-cols-4 gap-4 px-32">
         {filteredProducts.map((product) => (
-          <Product key={product.id} product={product} />
+          <Product key={product.str_masp} product={product} />
         ))}
       </div>
     </div>
   );
 };
 
-const tabs = ["All", "Juice", "Smoothie", "Tea"];
-
-const ChipTabs = ({ selectedCategory, setSelectedCategory }) => {
+const ChipTabs = ({ categories, selectedCategory, setSelectedCategory }) => {
   return (
-    <div className="px-36 py-6   flex items-center flex-wrap gap-2">
-      {tabs.map((tab) => (
+    <div className="px-36 py-6 flex items-center flex-wrap gap-2">
+      {categories.map((category: Category) => (
         <Chip
-          text={tab}
-          selected={selectedCategory === tab}
+          text={category.str_tenlh}  // Use correct property name here
+          value={category.str_malh}  // Use this for comparison
+          selected={selectedCategory === category.str_malh}
           setSelectedCategory={setSelectedCategory}
-          key={tab}
+          key={category.str_malh}
         />
       ))}
     </div>
   );
 };
 
-const Chip = ({ text, selected, setSelectedCategory }) => {
+const Chip = ({ text, value, selected, setSelectedCategory }) => {
   return (
     <button
-      onClick={() => setSelectedCategory(text)}
+      onClick={() => setSelectedCategory(value)} // Set selected category by `str_malh`
       className={`${
         selected
           ? "text-white font-black"

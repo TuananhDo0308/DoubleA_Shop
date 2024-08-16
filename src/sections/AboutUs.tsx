@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 
-import img1 from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"
+// import img1 from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"
 
 export const TextParallaxContentExample = () => {
   return (

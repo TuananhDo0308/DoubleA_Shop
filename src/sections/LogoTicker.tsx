@@ -1,6 +1,4 @@
-import logo1 from "@/assets/logo-acme.png"
-import logo2 from "@/assets/logo-apex.png"
-import logo3 from "@/assets/logo-celestial.png"
+import logo1 from "@/assets/products/companyLogo.png"
 
 import Image from "next/image";
 
@@ -16,7 +14,6 @@ export const LogoTicker = () => {
           <Image src={logo1} alt="logo1" className="logo-ticker-image"/>
           <Image src={logo1} alt="logo1" className="logo-ticker-image"/>
           <Image src={logo1} alt="logo1" className="logo-ticker-image"/>
-
         </div>
       </div>
     </div>

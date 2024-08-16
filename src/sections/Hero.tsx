@@ -1,19 +1,27 @@
 "use client";
 import Image from "next/image";
-import cogImage from "@/assets/cog.png"
-import Cylinder from "@/assets/cylinder.png"
-import noodleImage from '@/assets/noodle.png'
+import cogImage from "@/assets/products/cup.png"
+import Cylinder from "@/assets/products/cap.png"
+import noodleImage from '@/assets/products/cup1.png'
 import {motion,useScroll,useTransform} from "framer-motion"
 import { useRef } from "react";
+import { getPayments } from "@/services/checkoutAPI";
+import { useState } from "react";
+import SlideInNotifications from "@/components/Message";
 export const Hero = () => {
+
   const Heroref= useRef(null);
   const {scrollYProgress} =useScroll({
     target:Heroref,
     offset: ["start end","end start"]
   })
+ 
   const translateY = useTransform(scrollYProgress ,[0,1],[150,-150])
-  return <section className="pt-0 pb-20  md:pt-0 md:pb-10 bg-[radial-gradient(ellipse_200%_100%_at_bottom_left,#183EC2,#EAEEFE_100%)] overflow-x-clip" style={{ height: 'calc(100vh - 80px)' }}>
+  return <section 
+  className="pt-0 pb-20  md:pt-0 md:pb-10 bg-[radial-gradient(ellipse_200%_100%_at_bottom_left,#183EC2,#EAEEFE_100%)] overflow-x-clip" style={{ paddingTop: '80px' }}
+>
     <div className="container" style={{ height: 'calc(100vh - 100px)' }}>
+
       <div className="md:flex items-center" style={{ height: 'calc(100vh - 120px)' }}>
         <div className="md:w-[478px]  ">
           <div className="text-sm inline-flex border border-[#222]/10 px-3 rounded-lg tracking-tight mt-10">Version2.0 here</div>
@@ -40,7 +48,8 @@ export const Hero = () => {
           <motion.img 
             src={cogImage.src} 
             alt="Cog image" 
-            className="md:absolute lg:left-0 md:h-full md:w-auto md:max-w-none md:-left-6 "
+            width={550}
+            className="md:absolute lg:left-20 top- md:-left-6 "
             animate={{
               translateY:[-30,30],
             }}
@@ -53,9 +62,8 @@ export const Hero = () => {
           />
           <motion.img
             src={Cylinder.src} alt="Cylinder"
-            width={220}
-            height={220}
-            className="hidden md:block -top-20 -left-32 md:absolute"
+            width={350}
+            className="hidden md:block -top-32 -left-32 md:absolute"
             style={{
               translateY: translateY,
             }}
@@ -64,9 +72,9 @@ export const Hero = () => {
             src={noodleImage.src}
             alt="noodle"
             width={220}
-            className="hidden lg:block absolute top-[524px] left-[448px] rotate-[30deg]"
+            className="hidden lg:block absolute top-[500px] left-[448px] rotate-[30deg]"
             style={{
-              rotate:30,
+              rotate:0,
               translateY:translateY,
             }}
           />
