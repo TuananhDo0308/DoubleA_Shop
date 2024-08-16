@@ -89,7 +89,7 @@ export default function UserEditModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="relative w-full max-w-lg bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4">Edit Profile</h2>
+        <h2 className="text-3xl font-bold text-blue-800 mb-4">Edit Profile</h2>
 
         {/* Wrap form with FormProvider to provide form methods to children */}
         <FormProvider {...methods}>
@@ -97,32 +97,36 @@ export default function UserEditModal({ onClose }) {
 
             {/* Profile Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+              <label className="block text-lg font-bold text-gray-700">Profile Picture</label>
               <div className="mt-1 flex items-center">
                 {profilePicture instanceof File ? (
                   <Image
                     src={URL.createObjectURL(profilePicture)}
                     alt="Profile Preview"
-                    className="rounded-full object-cover"
+                    className="rounded-full object-cover cursor-pointer" // Add cursor-pointer for hover effect
                     width={150}
                     height={150}
+                    onClick={() => document.getElementById('profilePictureInput').click()} // Trigger file input click
                   />
                 ) : (
                   <Image
                     src={`${IMG_URL}/${user?.strimg}`}
                     alt="Profile Picture"
-                    className="rounded-full object-cover"
+                    className="rounded-full object-cover cursor-pointer" // Add cursor-pointer for hover effect
                     width={150}
                     height={150}
+                    onClick={() => document.getElementById('profilePictureInput').click()} // Trigger file input click
                   />
                 )}
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('profilePictureInput').click()}
-                  className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-                >
-                  Upload Image
-                </button>
+
+                <input
+                  type="file"
+                  id="profilePictureInput"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfilePictureChange} // Handle file change event
+                />
+
                 <input
                   type="file"
                   id="profilePictureInput"
@@ -137,7 +141,7 @@ export default function UserEditModal({ onClose }) {
 
             {/* Name Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <label className="block text-lg font-bold mt-2 text-gray-700">Name</label>
               <input
                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${errors.str_ho_ten ? "border-red-500" : ""}`}
                 type="text"
@@ -148,7 +152,7 @@ export default function UserEditModal({ onClose }) {
 
             {/* Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-lg font-bold mt-2 text-gray-700">Email</label>
               <input
                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${errors.str_email ? "border-red-500" : ""}`}
                 type="email"
@@ -159,7 +163,7 @@ export default function UserEditModal({ onClose }) {
 
             {/* Phone Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <label className="block text-lg font-bold mt-2 text-gray-700">Phone</label>
               <input
                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${errors.strsdt ? "border-red-500" : ""}`}
                 type="text"
@@ -170,7 +174,7 @@ export default function UserEditModal({ onClose }) {
 
             {/* Address Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Address</label>
+              <label className="block text-lg font-bold mt-2 text-gray-700">Address</label>
               <input
                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${errors.str_dia_chi ? "border-red-500" : ""}`}
                 type="text"
@@ -181,7 +185,7 @@ export default function UserEditModal({ onClose }) {
 
             {/* Date of Birth Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+              <label className="block text-lg font-bold mt-2 text-gray-700">Date of Birth</label>
               <input
                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${errors.ld_ngay_sinh ? "border-red-500" : ""}`}
                 type="date"

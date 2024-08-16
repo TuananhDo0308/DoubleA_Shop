@@ -4,6 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import DefaultAvatar from "@/assets/avatar-2.png"; // Path to default avatar image
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
+import { FaSignOutAlt } from "react-icons/fa"; // Import the logout icon
+
 export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
   const { user, signOut } = useAuth(); // Lấy hàm logout từ AuthContext
 
@@ -13,22 +15,28 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-opacity-50 flex justify-center items-center">
+      <div className="relative w-full h-full bg-blue-600 shadow-lg overflow-y-auto">
         <button
           onClick={() => setShowUserInfo(false)}
-          className="absolute top-4 left-4 z-50 text-xl font-bold text-white"
+          className="absolute top-4 left-4 z-50 text-xl font-bold text-white mb-8 bg-blue-700 px-5 py-2 rounded-xl hover:bg-blue-500"
         >
           &larr; Back
         </button>
-
+        <button
+          onClick={handleLogout} // Call the logout function on click
+          className="absolute top-5 right-5 z-50"
+          type="button"
+        >
+          <FaSignOutAlt className="text-white hover:text-gray-300 w-9 h-9" /> {/* Icon for logout */}
+        </button>
         {/* User Profile Section */}
         <div className="relative block h-64">
           <div
             className="absolute top-0 w-full h-full bg-center bg-cover"
             style={{
               backgroundImage:
-                "url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=2710&amp;q=80')",
+                "url('https://images.unsplash.com/photo-1604856420566-576ba98b53cd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
             }}
           >
             <span
@@ -75,18 +83,12 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
                     <div className="py-6 px-3 mt-32 sm:mt-0">
                       <button
                         onClick={onOpenEditModal} // Trigger modal when clicking edit
-                        className="bg-pink-500 active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150"
+                        className="bg-black hover:bg-gray-800 rounded-md mr-3 font-medium text-lg text-white px-5 py-2"
                         type="button"
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={handleLogout} // Gọi hàm logout khi click
-                        className="bg-pink-500 active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                      >
-                        Log out
-                      </button>
+                      
                     </div>
                   </div>
                   <div className="w-full lg:w-4/12 px-4 lg:order-1">

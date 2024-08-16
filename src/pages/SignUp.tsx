@@ -6,10 +6,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Image from "next/image";
 import defaultImage from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"; // Import the default image
 import { registerUser } from "@/services/signUpAPI";
+import Logo from "@/assets/logo.png";
+import { useRouter } from "next/router"; // Import useRouter
 
 
 const SignUp = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter(); // Initialize the router
 
   const stepOneSchema = yup.object().shape({
     firstName: yup.string().required("First Name is required"),
@@ -49,7 +52,6 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     try{
-      // const response = await registerUser(data);
       const formData = new FormData();
       formData.append("firstName", data.firstName);
       formData.append("lastName", data.lastName);
@@ -61,13 +63,13 @@ const SignUp = () => {
       formData.append("password", data.password);
       formData.append("profilePicture", data.profilePicture); // Thêm file ảnh vào form
 
-    const response = await registerUser(formData); // Gửi FormData
+      const response = await registerUser(formData); // Gửi FormData
       console.log("Final Data:", response);
-      window.location.href='/'
+      window.location.href='/';
     }catch (error) {
       console.error(error);
       alert(error.message || "Đã xảy ra lỗi khi tạo tài khoản");
-  }
+    }
   };
 
   const nextStep = async () => {
@@ -78,7 +80,6 @@ const SignUp = () => {
   };
 
   const prevStep = () => setCurrentStep((prev) => prev - 1);
-
   return (
     <div className="relative min-h-screen flex justify-center items-center">
       {/* Blurred Background */}
@@ -100,15 +101,19 @@ const SignUp = () => {
               {currentStep === 2 && <StepThree />}
               {currentStep === 3 && <StepFour />}
               <div className="flex justify-between mt-6">
-                {currentStep > 0 && (
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="px-4 py-2 bg-gray-300 rounded"
-                  >
-                    Previous
-                  </button>
-                )}
+                {/* Back button appears only on step 1 */}
+                  
+                  {currentStep > 0 && (
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="px-4 py-2 bg-gray-300 rounded"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  
+
                 {currentStep < 3 && (
                   <button
                     type="button"
@@ -118,6 +123,15 @@ const SignUp = () => {
                     Next
                   </button>
                 )}
+                {currentStep === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => router.push('/')}
+                      className="px-4 py-2 bg-gray-300 rounded"
+                    >
+                      Back
+                    </button>
+                  )}
                 {currentStep === 3 && (
                   <button
                     type="submit"
@@ -133,8 +147,8 @@ const SignUp = () => {
       </div>
 
       {/* Logo in the bottom-right corner */}
-      <div className="absolute bottom-4 right-4">
-        <img src="/path-to-your-logo.png" alt="Logo" className="w-24 h-auto" />
+      <div className="absolute top-10 left-10">
+        <Image src={Logo} alt="Logo" className="w-10 h-auto" />
       </div>
     </div>
   );
