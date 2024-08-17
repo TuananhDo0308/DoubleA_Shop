@@ -20,7 +20,6 @@ export default function Home() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false); // Add state for edit modal
 
-  const { user, cart } = useAuth();
 
   const handleAvatarClick = () => {
     setShowUserInfo(true); // Show UserInfo overlay when avatar is clicked

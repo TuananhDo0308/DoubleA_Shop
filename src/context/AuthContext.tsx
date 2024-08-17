@@ -1,13 +1,33 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect,ReactNode } from "react";
+interface AuthProviderProps {
+  children: ReactNode; // Định nghĩa kiểu cho children là ReactNode
+}
+// Xác định kiểu cho context
+interface AuthContextType {
+  user: any; // Bạn có thể tùy chỉnh kiểu cho user nếu có
+  cart: any[];
+  signIn: (userData: any, cartData: any) => void;
+  signOut: () => void;
+  setCart: React.Dispatch<React.SetStateAction<any[]>>;
+  setUser: React.Dispatch<React.SetStateAction<any>>;
+}
 
-const AuthContext = createContext(null);
+// Tạo AuthContext với kiểu dữ liệu chuẩn xác
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  cart: [],
+  signIn: () => {},
+  signOut: () => {},
+  setCart: () => {},
+  setUser: () => {},
+});
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [cart, setCart] = useState([]); // Initialize cart state
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<any>(null); // Kiểu của user là any, bạn có thể tùy chỉnh
+  const [cart, setCart] = useState<any[]>([]); // Giỏ hàng là mảng
 
-  // Load user and cart from localStorage on first render
+  // Load user và cart từ localStorage lần đầu tiên khi render
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedCart = localStorage.getItem("cart");
@@ -16,24 +36,26 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(storedUser));
     }
     if (storedCart) {
-      setCart(JSON.parse(storedCart));
+      setCart(JSON.parse(storedCart) || []); // Nếu không có dữ liệu thì để mảng rỗng
     }
   }, []);
 
-  const signIn = (userData, cartData) => {
+  // Hàm đăng nhập, thiết lập user và cart
+  const signIn = (userData: any, cartData: any) => {
     setUser(userData);
-    setCart(cartData?.CartDetails || []); // Set cart details from cartData
+    setCart(cartData?.CartDetails || []); // Đảm bảo cart luôn là mảng
 
-    // Save user and cart to localStorage for persistence
+    // Lưu trữ vào localStorage
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("cart", JSON.stringify(cartData?.CartDetails || []));
   };
 
+  // Hàm đăng xuất, xóa bỏ dữ liệu user và cart
   const signOut = () => {
     setUser(null);
-    setCart([]); // Clear cart on sign out
+    setCart([]); // Xóa cart khi đăng xuất
 
-    // Clear localStorage on sign out
+    // Xóa dữ liệu khỏi localStorage
     localStorage.removeItem("user");
     localStorage.removeItem("cart");
   };
@@ -45,6 +67,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// Hook để truy cập AuthContext
 export const useAuth = () => {
   return useContext(AuthContext);
 };

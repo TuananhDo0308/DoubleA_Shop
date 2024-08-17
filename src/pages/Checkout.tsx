@@ -1,6 +1,6 @@
 "use client";
 import "@/app/globals.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope, FaUser } from "react-icons/fa";
@@ -9,11 +9,57 @@ import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { IMG_URL } from "@/services/LinkAPI";
-export default function CheckoutPage({ setShowCheckout }) {
-  const [paymentMethod, setPaymentMethod] = useState(null);
-  const [paymentCost, setPaymentCost] = useState(0);
+interface Order {
+  userId: string;
+  payId: string;
+  email: string;
+  name: string;
+  phoneNumber: string;
+  billingAddress: string;
+  total: number;
+  cart: {
+    str_masp: string;
+    i_so_luong: number;
+    d_don_gia: number;
+    strimg: string;
+    str_tensp: string;
+  }[];
+  ldt_ngay_dat: Date;
+  ld_ngay_giao: Date | null;
+  d_tong: number;
+  str_tinh_trang: string;
+  BillDetails: {
+    productId: string;
+    quantity: number;
+  }[];
+}
+
+// Define the form data interface
+interface OrderFormData {
+  email: string;
+  name: string;
+  phoneNumber: string;
+  billingAddress: string;
+}
+
+// Define the payment method interface
+interface PaymentMethod {
+  str_mapt: string;
+  str_tenpt: string;
+  str_mo_ta: string;
+  d_gia: number;
+  strimg: string;
+}
+
+export default function CheckoutPage({
+  setShowCheckout,
+}: {
+  setShowCheckout: Dispatch<SetStateAction<boolean>>;
+}) {
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [paymentCost, setPaymentCost] = useState<number>(0);
   const { user, cart, setCart } = useAuth();
-  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   // Initialize form methods with react-hook-form
   const schema = yup.object().shape({
@@ -23,7 +69,7 @@ export default function CheckoutPage({ setShowCheckout }) {
     billingAddress: yup.string().required("Billing address is required"),
   });
 
-  const methods = useForm({
+  const methods = useForm<OrderFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
       email: user?.str_email || "",
@@ -64,36 +110,48 @@ export default function CheckoutPage({ setShowCheckout }) {
   const subtotal = cart.reduce((acc, product) => acc + product.d_don_gia * product.i_so_luong, 0);
   const sub = subtotal * (1 + vatRate);
   const total = (sub + paymentCost).toFixed(1); // Ensuring only one decimal place
-
-  // Handle place order and reset cart
-  const handlePlaceOrder = async (data) => {
-    const orderData = {
-      userId: user.str_mand,
-      payId: paymentMethod,
+  const handlePlaceOrder = async (data: OrderFormData) => {
+    const orderData: Order = {
+      userId: user.str_mand, // User ID
+      payId: paymentMethod || "", // Payment ID
       email: data.email,
       name: data.name,
       phoneNumber: data.phoneNumber,
       billingAddress: data.billingAddress,
-      total: total,
-      cart: cart,
+      total: parseFloat(total), // Convert total to number
+      cart: cart.map((product) => ({
+        str_masp: product.str_masp,
+        i_so_luong: product.i_so_luong,
+        d_don_gia: product.d_don_gia,
+        strimg: product.strimg,
+        str_tensp: product.str_tensp,
+      })),
+      ldt_ngay_dat: new Date(), // Order date
+      ld_ngay_giao: null, // Set delivery date to null for now
+      d_tong: parseFloat(total), // Total amount
+      str_tinh_trang: "Pending", // Initial order status
+      BillDetails: cart.map((product) => ({
+        productId: product.str_masp,
+        quantity: product.i_so_luong,
+      })),
     };
-
+  
     try {
       // Call API to place the order
       const response = await placeOrder(orderData);
       console.log("Order placed successfully:", response);
       alert("Order placed successfully!");
-
+  
       // Clear the cart in AuthContext
       setCart([]); // Clear the cart
-
+  
       setShowCheckout(false); // Close the checkout page
     } catch (error) {
-      console.error('Failed to place order:', error);
-      alert('Failed to place order. Please try again.');
+      console.error("Failed to place order:", error);
+      alert("Failed to place order. Please try again.");
     }
   };
-
+  
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 w-full flex justify-center items-center">
       <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
@@ -168,7 +226,6 @@ export default function CheckoutPage({ setShowCheckout }) {
                     <input
                       type="text"
                       id="email"
-                      name="email"
                       className={`w-full rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-200'} px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500`}
                       placeholder="your.email@gmail.com"
                       {...methods.register("email")}
@@ -186,7 +243,6 @@ export default function CheckoutPage({ setShowCheckout }) {
                     <input
                       type="text"
                       id="name"
-                      name="name"
                       className={`w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-gray-200'} px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500`}
                       placeholder="Your full name"
                       {...methods.register("name")}
@@ -204,7 +260,6 @@ export default function CheckoutPage({ setShowCheckout }) {
                     <input
                       type="text"
                       id="phoneNumber"
-                      name="phoneNumber"
                       className={`w-full rounded-md border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-200'} px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500`}
                       placeholder="Your phone number"
                       {...methods.register("phoneNumber")}
@@ -222,7 +277,6 @@ export default function CheckoutPage({ setShowCheckout }) {
                     <input
                       type="text"
                       id="billingAddress"
-                      name="billingAddress"
                       className={`w-full rounded-md border ${errors.billingAddress ? 'border-red-500' : 'border-gray-200'} px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500`}
                       placeholder="Your billing address"
                       {...methods.register("billingAddress")}

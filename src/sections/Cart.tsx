@@ -11,14 +11,21 @@ import {
 import Image from "next/image";
 import Icon from "@/assets/BagIcon.png";
 import { useAuth } from "@/context/AuthContext";
-import { removeItems } from "@/services/cartAPI";
-import { updateCart } from "@/services/cartAPI";
-export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
+import { removeItems, updateCart } from "@/services/cartAPI";
+
+interface DragCloseDrawerExampleProps {
+  onCheckoutClick: () => void;
+}
+
+export const DragCloseDrawerExample: React.FC<DragCloseDrawerExampleProps> = ({
+  onCheckoutClick,
+}) => {
   const { user, cart, setCart } = useAuth();
   const [open, setOpen] = useState(false);
 
   const vatRate = 0.1; // 10%
-  const handleQuantityChange = async (id, delta) => {
+
+  const handleQuantityChange = async (id: string, delta: number) => {
     const updatedCart = cart.map((product) =>
       product.str_masp === id
         ? { ...product, i_so_luong: Math.max(1, product.i_so_luong + delta) }
@@ -26,41 +33,37 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
     );
 
     try {
-      await updateQuantityDB(id, updatedCart.find(product => product.str_masp === id).i_so_luong); // Gọi hàm async với await
-      setCart(updatedCart); // Cập nhật cart sau khi cập nhật thành công trong DB
+      const newQuantity = updatedCart.find(
+        (product) => product.str_masp === id
+      )?.i_so_luong;
+      if (newQuantity !== undefined) {
+        await updateQuantityDB(id, newQuantity);
+        setCart(updatedCart);
+      }
     } catch (error) {
-      console.error('Error updating cart quantity:', error);
-      alert('Failed to update product quantity. Please try again.');
-    }
-};
-
-  
-  const updateQuantityDB = async (id, soluong) => {
-    try {
-      const response = await updateCart(user.str_mand, id, soluong); // Chuyển số lượng vào đây
-      return response.data; // Trả về dữ liệu nếu cần
-    } catch (error) {
-      console.error('Error updating quantity in DB:', error);
-      throw error; // Ném lỗi để hàm gọi có thể xử lý
+      console.error("Error updating cart quantity:", error);
+      alert("Failed to update product quantity. Please try again.");
     }
   };
-  
 
-  const handleRemoveProduct = async (id) => {
-    
-    // // Update the cart stored in AuthContext by filtering out the product
-    // const updatedCart = cart.filter((product) => product.str_masp !== id);
-    
-    // setCart(updatedCart); // Update the cart in AuthContext
+  const updateQuantityDB = async (id: string, soluong: number) => {
     try {
-      const response = await removeItems(user.str_mand,id);
-      // Update the cart stored in AuthContext by filtering out the product
+      const response = await updateCart(user?.str_mand, id, soluong);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating quantity in DB:", error);
+      throw error;
+    }
+  };
+
+  const handleRemoveProduct = async (id: string) => {
+    try {
+      await removeItems(user?.str_mand, id);
       const updatedCart = cart.filter((product) => product.str_masp !== id);
-    
-    setCart(updatedCart); // Update the cart in AuthContext
+      setCart(updatedCart);
     } catch (error) {
       console.error(error);
-      alert(error.message || "Remove failed!");
+      alert("Remove failed!");
     }
   };
 
@@ -71,7 +74,7 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
 
   const total = subtotal + subtotal * vatRate;
 
-  if (!user) return null; // If not logged in, don't display the cart button
+  if (!user) return null;
 
   return (
     <div className="absolute h-screen z-50">
@@ -94,7 +97,7 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
                 >
                   <div className="relative w-full h-60 sm:w-40 sm:h-40">
                     <Image
-                      src={`${IMG_URL}/${product.strimg}`} // Replace with correct image path
+                      src={`${IMG_URL}/${product.strimg}`}
                       alt={product.str_tensp}
                       className="object-cover rounded-lg"
                       layout="fill"
@@ -163,7 +166,9 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-700">VAT</p>
-                <p className="text-gray-700">{(vatRate * 100).toLocaleString()} %</p>
+                <p className="text-gray-700">
+                  {(vatRate * 100).toLocaleString()} %
+                </p>
               </div>
               <hr className="my-4" />
               <div className="flex justify-between">
@@ -182,11 +187,10 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
                     ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
-                disabled={cart.length === 0} // Disable button if cart is empty
+                disabled={cart.length === 0}
               >
                 Check out
               </button>
-
             </div>
           </div>
         </div>
@@ -195,23 +199,29 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
   );
 };
 
-const DragCloseDrawer = ({ open, setOpen, children }) => {
+interface DragCloseDrawerProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+}
+
+const DragCloseDrawer: React.FC<DragCloseDrawerProps> = ({
+  open,
+  setOpen,
+  children,
+}) => {
   const [scope, animate] = useAnimate();
-  const [drawerRef, { height }] = useMeasure();
+  const [drawerRef, dimensions] = useMeasure<HTMLDivElement>(); // This now correctly points to the ref, not dimensions.
 
   const y = useMotionValue(0);
   const controls = useDragControls();
 
   const handleClose = async () => {
-    animate(scope.current, {
-      opacity: [1, 0],
-    });
+    animate(scope.current, { opacity: [1, 0] });
 
     const yStart = typeof y.get() === "number" ? y.get() : 0;
 
-    await animate("#drawer", {
-      y: [yStart, height],
-    });
+    await animate("#drawer", { y: [yStart] }); // Using dimensions.height to calculate the drawer closing.
 
     setOpen(false);
   };
@@ -228,13 +238,10 @@ const DragCloseDrawer = ({ open, setOpen, children }) => {
         >
           <motion.div
             id="drawer"
-            ref={drawerRef}
             onClick={(e) => e.stopPropagation()}
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
-            transition={{
-              ease: "easeInOut",
-            }}
+            transition={{ ease: "easeInOut" }}
             className="absolute bottom-0 h-[90vh] w-full overflow-hidden rounded-t-3xl bg-white"
             style={{ y }}
             drag="y"
@@ -245,20 +252,12 @@ const DragCloseDrawer = ({ open, setOpen, children }) => {
               }
             }}
             dragListener={false}
-            dragConstraints={{
-              top: 0,
-              bottom: 0,
-            }}
-            dragElastic={{
-              top: 0,
-              bottom: 0.5,
-            }}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.5 }}
           >
             <div className="absolute left-0 right-0 top-0 z-10 flex justify-center bg-white p-4">
               <button
-                onPointerDown={(e) => {
-                  controls.start(e);
-                }}
+                onPointerDown={(e) => controls.start(e)}
                 className="h-2 w-14 cursor-grab touch-none rounded-full bg-neutral-700 active:cursor-grabbing"
               ></button>
             </div>

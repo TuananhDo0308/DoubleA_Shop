@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  
   webpack(config) {
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
@@ -29,8 +30,11 @@ const nextConfig = {
   },
   images: {
     domains: ['c8e4-14-241-230-38.ngrok-free.app'], // Thay thế bằng domain ngrok của bạn
+    unoptimized: true
   },
   // ...other config
+    output: 'export',
+  
 };
 
 export default nextConfig;

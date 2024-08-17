@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -7,6 +7,7 @@ import { updateProfile } from "@/services/signUpAPI"; // Import API call to upda
 import { useAuth } from "@/context/AuthContext"; // Import useAuth from AuthContext
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
+
 
 // Validation schema for the form
 const schema = yup.object().shape({
@@ -18,8 +19,17 @@ const schema = yup.object().shape({
   profilePicture: yup.mixed().notRequired(),
 });
 
-export default function UserEditModal({ onClose }) {
+interface Edit {
+  onClose: () => void;
+}
+
+export default function UserEditModal({ onClose }: Edit) {
   const { user, setUser } = useAuth(); // Get the user and setUser from the AuthContext
+
+  // Safely parse the date, if available
+  const parsedDate = user?.ld_ngay_sinh && !isNaN(Date.parse(user.ld_ngay_sinh))
+    ? new Date(user.ld_ngay_sinh)
+    : null; // Return null if the date is invalid
 
   // Initialize form methods with react-hook-form
   const methods = useForm({
@@ -29,8 +39,8 @@ export default function UserEditModal({ onClose }) {
       str_email: user?.str_email || "",
       strsdt: user?.strsdt || "",
       str_dia_chi: user?.str_dia_chi || "",
-      ld_ngay_sinh: user?.ld_ngay_sinh || "",
-      profilePicture: user?.strimg || "",
+      ld_ngay_sinh: parsedDate, // Pass a Date object or null
+      profilePicture: null, // Start with no new file selected
     },
     mode: "onTouched",
   });
@@ -38,53 +48,48 @@ export default function UserEditModal({ onClose }) {
   const { handleSubmit, setValue, watch, formState: { errors } } = methods;
   const profilePicture = watch("profilePicture");
 
-  const handleProfilePictureChange = (e) => {
-    const file = e.target.files[0];
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setValue("profilePicture", file);
     }
   };
-
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => {
     try {
-      // Prepare the FormData object
-      const formData = new FormData();
+      const formData = new FormData(); // Web API FormData object
       formData.append("userID", user.str_mand);
       formData.append("newName", data.str_ho_ten);
       formData.append("email", data.str_email);
       formData.append("password", user.str_mat_khau); // Keep the current password
       formData.append("phone", data.strsdt);
-      formData.append("dob", data.ld_ngay_sinh);
+      formData.append("dob", data.ld_ngay_sinh?.toISOString().substring(0, 10)); // Convert date to string
       formData.append("address", data.str_dia_chi);
-
-      // If a new image was uploaded, append it to the form data
-      if (data.profilePicture) {
-        formData.append("profilePicture", data.profilePicture);
+  
+      if (data.profilePicture instanceof File) {
+        formData.append("profilePicture", data.profilePicture); // Append file if exists
       }
-      else{
-        formData.append("profilePicture", user.strimg);
-      }
-      console.log("hello2",user)
-
-      // Call the API to update the profile
-      const response = await updateProfile(formData);
-
-      // Update the user in the AuthContext globally
-      user.str_ho_ten= data.str_ho_ten;
-      user.str_email= data.str_email;
-      user.strsdt= data.strsdt;
-      user.ld_ngay_sinh=response.user.ld_ngay_sinh;
-      user.str_dia_chi= data.str_dia_chi;
-      user.strimg= response.user.strimg;
-      setUser(user);
-      console.log("Profile updated successfully:", response);
-
-      onClose(); // Close the modal after a successful update
+  
+      const response = await updateProfile(formData); // Ensure updateProfile accepts FormData
+  
+      // Update user data locally
+      const updatedUser = {
+        ...user,
+        str_ho_ten: data.str_ho_ten,
+        str_email: data.str_email,
+        strsdt: data.strsdt,
+        ld_ngay_sinh: response.user.ld_ngay_sinh,
+        str_dia_chi: data.str_dia_chi,
+        strimg: response.user.strimg || user.strimg, // Use updated image or fallback to current one
+      };
+      setUser(updatedUser);
+  
+      onClose(); // Close modal after success
     } catch (error) {
       console.error("Failed to update profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
+  
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
@@ -94,7 +99,6 @@ export default function UserEditModal({ onClose }) {
         {/* Wrap form with FormProvider to provide form methods to children */}
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-
             {/* Profile Image Upload */}
             <div>
               <label className="block text-lg font-bold text-gray-700">Profile Picture</label>
@@ -103,19 +107,19 @@ export default function UserEditModal({ onClose }) {
                   <Image
                     src={URL.createObjectURL(profilePicture)}
                     alt="Profile Preview"
-                    className="rounded-full object-cover cursor-pointer" // Add cursor-pointer for hover effect
+                    className="rounded-full object-cover cursor-pointer"
                     width={150}
                     height={150}
-                    onClick={() => document.getElementById('profilePictureInput').click()} // Trigger file input click
+                    onClick={() => document.getElementById("profilePictureInput")?.click()}
                   />
                 ) : (
                   <Image
                     src={`${IMG_URL}/${user?.strimg}`}
                     alt="Profile Picture"
-                    className="rounded-full object-cover cursor-pointer" // Add cursor-pointer for hover effect
+                    className="rounded-full object-cover cursor-pointer"
                     width={150}
                     height={150}
-                    onClick={() => document.getElementById('profilePictureInput').click()} // Trigger file input click
+                    onClick={() => document.getElementById("profilePictureInput")?.click()}
                   />
                 )}
 
@@ -123,19 +127,9 @@ export default function UserEditModal({ onClose }) {
                   type="file"
                   id="profilePictureInput"
                   accept="image/*"
-                  className="hidden"
-                  onChange={handleProfilePictureChange} // Handle file change event
-                />
-
-                <input
-                  type="file"
-                  id="profilePictureInput"
-                  accept="image/*"
-                  {...methods.register("profilePicture")}
                   onChange={handleProfilePictureChange}
                   className="hidden"
                 />
-                {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture.message}</p>}
               </div>
             </div>
 
@@ -209,7 +203,6 @@ export default function UserEditModal({ onClose }) {
                 Update
               </button>
             </div>
-
           </form>
         </FormProvider>
       </div>

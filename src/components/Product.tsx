@@ -12,18 +12,21 @@ interface ProductProps {
   product: ProductType;
 }
 
+interface Notification {
+  id: number;
+  message: string;
+}
+
 export const Product: React.FC<ProductProps> = ({ product }) => {
-  const { cart, setCart } = useAuth();
-  const { user } = useAuth();
-  const [notifications, setNotifications] = useState([]); // State for notifications
+  const { cart, setCart, user } = useAuth(); // Combine useAuth to access cart and user
+  const [notifications, setNotifications] = useState<Notification[]>([]); // State for notifications with type
 
   const handleAddToCart = async () => {
     try {
-      const productInCart = cart.find(item => item.str_masp === product.str_masp);
-      const desiredQuantity = productInCart ? productInCart.i_so_luong + 1 : 1;
+      const productInCart = cart.find(item => item === product.str_masp);
+      const desiredQuantity = productInCart ? productInCart + 1 : 1;
 
       if (product.i_so_luong < desiredQuantity) {
-        // Thay thế console.log bằng setNotifications
         setNotifications(prev => [
           { id: Math.random(), message: `Not enough stock for ${product.str_tensp}` },
           ...prev
@@ -43,7 +46,6 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
       const updatedCart = getUpdatedCart();
       setCart(updatedCart); // Cập nhật giỏ hàng trong AuthContext
     } catch (error) {
-      // Thêm thông báo lỗi thay vì dùng console.log
       setNotifications(prev => [
         { id: Math.random(), message: 'Error adding product to cart' },
         ...prev
@@ -53,11 +55,10 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
 
   const addProductToCartInDB = async () => {
     try {
-      await addToCart(user.str_mand, product.str_masp);
+      await addToCart(user.str_mand, product.str_masp); // Gọi API để thêm sản phẩm vào giỏ hàng
     } catch (error) {
-      // Thêm thông báo lỗi thay vì dùng console.log
       setNotifications(prev => [
-        { id: Math.random(), message: error.message || "Failed to add product to cart." },
+        { id: Math.random(), message: "Failed to add product to cart." },
         ...prev
       ]);
     }
@@ -76,7 +77,7 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     return updatedCart;
   };
 
-  const removeNotif = (id) => {
+  const removeNotif = (id: number) => {
     setNotifications(prevNotifs => prevNotifs.filter(n => n.id !== id));
   };
 
@@ -105,12 +106,17 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     </div>
   );
 };
+interface TiltCardProps {
+  imageSrc: string; // Đường dẫn đến hình ảnh là chuỗi
+  altText: string;  // Văn bản thay thế cũng là chuỗi
+}
 
 const ROTATION_RANGE = 32.5;
-const HALF_ROTATION_RANGE = 32.5 / 2;
+const HALF_ROTATION_RANGE = ROTATION_RANGE / 2;
 
-const TiltCard = ({ imageSrc, altText }) => {
-  const ref = useRef(null);
+// Sửa đổi TiltCard để nhận props với kiểu xác định
+const TiltCard: React.FC<TiltCardProps> = ({ imageSrc, altText }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -120,7 +126,7 @@ const TiltCard = ({ imageSrc, altText }) => {
 
   const transform = useMotionTemplate`rotateX(${xSpring}deg) rotateY(${ySpring}deg)`;
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
@@ -154,7 +160,6 @@ const TiltCard = ({ imageSrc, altText }) => {
         height: "300px",
       }}
       className="relative rounded-xl bg-gradient-to-br from-blue-500 to-[#183ec2]"
-      
     >
       <div
         style={{

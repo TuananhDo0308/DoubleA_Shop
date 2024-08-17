@@ -1,13 +1,26 @@
+"use client";
 import "@/app/globals.css";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginUser } from "@/services/signUpAPI";
 import { useAuth } from "@/context/AuthContext";
-const SignIn = ({ setShowSignIn }) => {
+
+// Define the form data interface
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
+interface SignInProps {
+  setShowSignIn: Dispatch<SetStateAction<boolean>>;
+}
+
+const SignIn: React.FC<SignInProps> = ({ setShowSignIn }) => {
   const { signIn } = useAuth();
 
+  // Validation schema using Yup
   const validationSchema = yup.object().shape({
     email: yup
       .string()
@@ -19,25 +32,31 @@ const SignIn = ({ setShowSignIn }) => {
       .required("Password is required"),
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  // Setup react-hook-form with Yup resolver
+  const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = async (data) => {
+  // Handle form submission
+  const onSubmit = async (data: SignInFormData) => {
     try {
       const response = await loginUser(data);
-      console.log("Cart:", response.user);
-      console.log(response.user.strimg)
-      signIn(response.user, response.cart); // Pass the cart data to signIn
-    
-      setShowSignIn(false); // Close the SignIn form after successful login
-      localStorage.setItem('userId', response.user.str_mand);
-    } catch (error) {
+      console.log("User:", response.user);
+      console.log("Image URL:", response.user.strimg);
+      
+      // Use signIn function from context
+      signIn(response.user, response.cart);
+
+      // Close the SignIn form after successful login
+      setShowSignIn(false);
+      
+      // Store userId in localStorage
+      localStorage.setItem("userId", response.user.str_mand);
+    } catch (error: any) {
       console.error(error);
       alert(error.message || "Login failed!");
     }
   };
-  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -75,7 +94,7 @@ const SignIn = ({ setShowSignIn }) => {
             </div>
             <div className="flex justify-between items-center">
               <div className="items-center flex justify-center gap-2">
-                <input className="cursor-pointer" type="radio" name="rememberme" />
+                <input className="cursor-pointer" type="checkbox" name="rememberme" />
                 <span className="text-sm">Remember Me</span>
               </div>
               <span className="text-sm text-blue-700 hover:underline cursor-pointer">Forgot password?</span>
@@ -83,7 +102,12 @@ const SignIn = ({ setShowSignIn }) => {
             <div>
               <button className="mt-4 mb-3 w-full bg-[#183ec2] hover:bg-blue-400 text-white py-2 rounded-md transition duration-100">Login now</button>
             </div>
-            <p className="mt-8">Don&apos;t have an account? <span className="cursor-pointer text-sm text-blue-600" onClick={() => window.location.href='/SignUp'}>Join free today</span></p>
+            <p className="mt-8">
+              Don&apos;t have an account?{" "}
+              <span className="cursor-pointer text-sm text-blue-600" onClick={() => window.location.href = '/SignUp'}>
+                Join free today
+              </span>
+            </p>
           </form>
         </div>
       </div>

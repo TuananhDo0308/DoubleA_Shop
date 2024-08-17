@@ -5,7 +5,7 @@ import img1 from "@/assets/products/Banner/Banner1.jpg";
 import img2 from "@/assets/products/Banner/Banner2.jpg";
 import img3 from "@/assets/products/Banner/Banner3.png";
 
-const imgs = [img1,img2,img3];
+const imgs = [img1, img2, img3];
 
 const ONE_SECOND = 1000;
 const AUTO_DELAY = ONE_SECOND * 10;
@@ -18,7 +18,7 @@ const SPRING_OPTIONS = {
   damping: 50,
 };
 
-export const SwipeCarousel = () => {
+export const SwipeCarousel: React.FC = () => {
   const [imgIndex, setImgIndex] = useState(0);
 
   const dragX = useMotionValue(0);
@@ -38,7 +38,7 @@ export const SwipeCarousel = () => {
     }, AUTO_DELAY);
 
     return () => clearInterval(intervalRef);
-  }, []);
+  }, [dragX]);
 
   const onDragEnd = () => {
     const x = dragX.get();
@@ -52,7 +52,6 @@ export const SwipeCarousel = () => {
 
   return (
     <div className="relative overflow-hidden px-28 py-8">
-      
       <motion.div
         drag="x"
         dragConstraints={{
@@ -73,12 +72,15 @@ export const SwipeCarousel = () => {
       </motion.div>
 
       <Dots imgIndex={imgIndex} setImgIndex={setImgIndex} />
-      <GradientEdges />
     </div>
   );
 };
 
-const Images = ({ imgIndex }) => {
+interface ImagesProps {
+  imgIndex: number;
+}
+
+const Images: React.FC<ImagesProps> = ({ imgIndex }) => {
   return (
     <>
       {imgs.map((imgSrc, idx) => {
@@ -89,13 +91,13 @@ const Images = ({ imgIndex }) => {
               backgroundImage: `url(${imgSrc.src})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: '300px', // đặt chiều cao cố định
+              height: '300px', // Fixed height for the images
             }}
             animate={{
               scale: imgIndex === idx ? 0.95 : 0.85,
             }}
             transition={SPRING_OPTIONS}
-            className="shrink-0 rounded-xl w-[calc(100vw-224px)]  bg-neutral-800 object-cover"
+            className="shrink-0 rounded-xl w-[calc(100vw-224px)] bg-neutral-800 object-cover"
           />
         );
       })}
@@ -103,8 +105,12 @@ const Images = ({ imgIndex }) => {
   );
 };
 
+interface DotsProps {
+  imgIndex: number;
+  setImgIndex: React.Dispatch<React.SetStateAction<number>>;
+}
 
-const Dots = ({ imgIndex, setImgIndex }) => {
+const Dots: React.FC<DotsProps> = ({ imgIndex, setImgIndex }) => {
   return (
     <div className="mt-4 flex w-full justify-center gap-2">
       {imgs.map((_, idx) => {
@@ -119,11 +125,5 @@ const Dots = ({ imgIndex, setImgIndex }) => {
         );
       })}
     </div>
-  );
-};
-
-const GradientEdges = () => {
-  return (
-    <div></div>
   );
 };

@@ -1,26 +1,50 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { getHistory } from "@/services/signUpAPI"; // API lấy lịch sử đơn hàng
+import { getHistory } from "@/services/signUpAPI"; // API to get order history
 import { IMG_URL } from "@/services/LinkAPI";
+
+interface OrderDetail {
+  Product: {
+    str_tensp?: string;
+    strimg?: string;
+    d_don_gia?: number;
+  };
+  i_so_luong?: number;
+}
+
+interface Order {
+  str_ho_ten?: string;
+  strsdt?: string;
+  str_dia_chi_nhan?: string;
+  ldt_ngay_dat?: string;
+  ld_ngay_giao?: string;
+  d_tong?: number;
+  str_tinh_trang?: string;
+  BillDetails?: OrderDetail[];
+}
 
 export const OrderHistory = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  // Hàm lấy dữ liệu lịch sử đơn hàng từ API
+  // Fetch orders and set them into state
   const fetchHistoryOrders = async () => {
     try {
+      if (!user?.str_mand) {
+        console.error("User ID is missing.");
+        return;
+      }
+
       const sendInfo = {
-        userId: user.str_mand, // Lấy str_mand từ user
+        userId: user.str_mand,
       };
 
-      // Gửi sendInfo tới API để lấy lịch sử đơn hàng
       const response = await getHistory(sendInfo);
-      console.log("orders data:", response);
 
+      // Ensure response is an array
       if (Array.isArray(response)) {
-        setOrders(response);
+        setOrders(response as Order[]); // Cast to Order[]
       } else {
         console.error("Unexpected response structure:", response);
       }
@@ -29,10 +53,9 @@ export const OrderHistory = () => {
     }
   };
 
-  // Lấy dữ liệu khi component được render
   useEffect(() => {
     if (user?.str_mand) {
-      fetchHistoryOrders(); 
+      fetchHistoryOrders();
     }
   }, [user?.str_mand]);
 
@@ -45,45 +68,49 @@ export const OrderHistory = () => {
       {orders.length > 0 ? (
         orders.map((order, index) => (
           <div key={index} className="mb-10 border rounded-lg p-4 shadow-sm">
+            {/* Customer information */}
             <div className="mb-4">
               <p className="text-lg font-medium">Customer Information</p>
               <p className="text-gray-700">
-                <strong>Name:</strong> {order.str_ho_ten || user.str_ho_ten}
+                <strong>Name:</strong> {order.str_ho_ten || user?.str_ho_ten || "N/A"}
               </p>
               <p className="text-gray-700">
-                <strong>Phone:</strong> {order.strsdt || user.strsdt}
+                <strong>Phone:</strong> {order.strsdt || user?.strsdt || "N/A"}
               </p>
               <p className="text-gray-700">
-                <strong>Email:</strong> {user.str_email}
+                <strong>Email:</strong> {user?.str_email || "N/A"}
               </p>
               <p className="text-gray-700">
-                <strong>Address:</strong> {order.str_dia_chi_nhan || user.str_dia_chi}
+                <strong>Address:</strong> {order.str_dia_chi_nhan || user?.str_dia_chi || "N/A"}
               </p>
             </div>
 
+            {/* Order details */}
             <div className="flex justify-between items-center mb-4">
               <div>
                 <p className="text-sm text-gray-500">Order Date</p>
-                <p className="text-lg font-medium">{new Date(order.ldt_ngay_dat).toLocaleString()}</p>
+                <p className="text-lg font-medium">{order.ldt_ngay_dat ? new Date(order.ldt_ngay_dat).toLocaleString() : "N/A"}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Delivery Date</p>
-                <p className="text-lg font-medium">{new Date(order.ld_ngay_giao).toLocaleString()}</p>
+                <p className="text-lg font-medium">{order.ld_ngay_giao ? new Date(order.ld_ngay_giao).toLocaleString() : "N/A"}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total amount</p>
-                <p className="text-lg font-medium">{order.d_tong}$</p>
+                <p className="text-lg font-medium">{order.d_tong ? `${order.d_tong}$` : "N/A"}</p>
               </div>
               <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
                 View Invoice
               </button>
             </div>
 
+            {/* Order status */}
             <p className="text-sm text-gray-500">Status</p>
             <p className={`text-lg font-medium mb-4 ${order.str_tinh_trang === "Delivered" ? "text-green-600" : "text-red-600"}`}>
-              {order.str_tinh_trang}
+              {order.str_tinh_trang || "Unknown"}
             </p>
 
+            {/* Product details */}
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white">
                 <thead className="bg-gray-50">
@@ -97,17 +124,21 @@ export const OrderHistory = () => {
                   {order.BillDetails?.map((detail, idx) => (
                     <tr key={idx} className="border-t">
                       <td className="flex items-center py-4 px-4">
-                        <Image
-                          src={`${IMG_URL}/${detail.Product.strimg}`}
-                          alt={detail.Product.str_tensp}
-                          width={60}
-                          height={60}
-                          className="mr-4 rounded-md border object-cover object-center"
-                        />
-                        <p>{detail.Product.str_tensp}</p>
+                        {detail.Product?.strimg ? (
+                          <Image
+                            src={`${IMG_URL}/${detail.Product.strimg}`}
+                            alt={detail.Product?.str_tensp || "Product Image"}
+                            width={60}
+                            height={60}
+                            className="mr-4 rounded-md border object-cover object-center"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">No Image</div>
+                        )}
+                        <p>{detail.Product?.str_tensp || "Unknown Product"}</p>
                       </td>
-                      <td className="py-4 px-4">{detail.i_so_luong}</td>
-                      <td className="py-4 px-4">{detail.Product.d_don_gia}$</td>
+                      <td className="py-4 px-4">{detail.i_so_luong || "N/A"}</td>
+                      <td className="py-4 px-4">{detail.Product?.d_don_gia ? `${detail.Product.d_don_gia}$` : "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>

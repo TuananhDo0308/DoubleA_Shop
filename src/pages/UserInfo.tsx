@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { OrderHistory } from "@/sections/OrderHistory"; // Adjust the import path accordingly
 import { useAuth } from "@/context/AuthContext";
 import DefaultAvatar from "@/assets/avatar-2.png"; // Path to default avatar image
@@ -6,7 +6,12 @@ import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
 import { FaSignOutAlt } from "react-icons/fa"; // Import the logout icon
 
-export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
+interface UserInfoProps {
+  setShowUserInfo: React.Dispatch<React.SetStateAction<boolean>>;
+  onOpenEditModal: () => void;
+}
+
+export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoProps) {
   const { user, signOut } = useAuth(); // Lấy hàm logout từ AuthContext
 
   const handleLogout = () => {
@@ -15,7 +20,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
         <button
           onClick={() => setShowUserInfo(false)}
@@ -73,7 +78,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
                   <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
                     <Image
                       alt="Profile"
-                      src={`${IMG_URL}/${user?.strimg}` || DefaultAvatar}
+                      src={user?.strimg ? `${IMG_URL}/${user.strimg}` : DefaultAvatar}
                       className="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px"
                       width={150}
                       height={150}
@@ -88,7 +93,6 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
                       >
                         Edit
                       </button>
-                      
                     </div>
                   </div>
                   <div className="w-full lg:w-4/12 px-4 lg:order-1">

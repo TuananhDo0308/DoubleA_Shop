@@ -1,14 +1,18 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, ReactNode } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 
-// import img1 from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"
+interface TextParallaxContentProps {
+  imgUrl: string;
+  subheading: string;
+  heading: string;
+  children: ReactNode;
+}
 
 export const TextParallaxContentExample = () => {
   return (
     <div className="bg-transparent">
-      
       <TextParallaxContent
         imgUrl="https://images.unsplash.com/photo-1614738149154-d6c9f6668b34?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         subheading="Local Produce"
@@ -23,14 +27,18 @@ export const TextParallaxContentExample = () => {
       >
         <ExampleContent />
       </TextParallaxContent>
-      
     </div>
   );
 };
 
 const IMG_PADDING = 12;
 
-const TextParallaxContent = ({ imgUrl, subheading, heading, children }) => {
+const TextParallaxContent: React.FC<TextParallaxContentProps> = ({
+  imgUrl,
+  subheading,
+  heading,
+  children,
+}) => {
   return (
     <div
       style={{
@@ -47,8 +55,12 @@ const TextParallaxContent = ({ imgUrl, subheading, heading, children }) => {
   );
 };
 
-const StickyImage = ({ imgUrl }) => {
-  const targetRef = useRef(null);
+interface StickyImageProps {
+  imgUrl: string;
+}
+
+const StickyImage: React.FC<StickyImageProps> = ({ imgUrl }) => {
+  const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["end end", "end start"],
@@ -80,8 +92,13 @@ const StickyImage = ({ imgUrl }) => {
   );
 };
 
-const OverlayCopy = ({ subheading, heading }) => {
-  const targetRef = useRef(null);
+interface OverlayCopyProps {
+  subheading: string;
+  heading: string;
+}
+
+const OverlayCopy: React.FC<OverlayCopyProps> = ({ subheading, heading }) => {
+  const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start end", "end start"],
