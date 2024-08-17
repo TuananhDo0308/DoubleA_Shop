@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext"; // Import useAuth to access the cart
 import { addToCart } from "@/services/cartAPI";
 import SlideInNotifications from "./Message"; // Import SlideInNotifications
+import { IMG_URL } from "@/services/LinkAPI";
 
 interface ProductProps {
   product: ProductType;
@@ -83,7 +84,7 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     <div className="p-4">
       <SlideInNotifications notifications={notifications} removeNotif={removeNotif} /> {/* Pass notifications and removeNotif */}
       <div className="w-full">
-        <TiltCard imageSrc={product.strimg} altText={product.str_tensp} />
+        <TiltCard imageSrc={`${IMG_URL}/${product.strimg}`} altText={product.str_tensp} />
       </div>
       <h3 className="mt-2 text-lg font-extrabold uppercase px-4">{product.str_tensp}</h3>
       

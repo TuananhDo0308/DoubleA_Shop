@@ -5,7 +5,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginUser } from "@/services/signUpAPI";
 import { useAuth } from "@/context/AuthContext";
-import { getCart } from "@/services/cartAPI";
 const SignIn = ({ setShowSignIn }) => {
   const { signIn } = useAuth();
 
@@ -84,7 +83,7 @@ const SignIn = ({ setShowSignIn }) => {
             <div>
               <button className="mt-4 mb-3 w-full bg-[#183ec2] hover:bg-blue-400 text-white py-2 rounded-md transition duration-100">Login now</button>
             </div>
-            <p className="mt-8">Don't have an account? <span className="cursor-pointer text-sm text-blue-600" onClick={() => window.location.href='/SignUp'}>Join free today</span></p>
+            <p className="mt-8">Don&apos;t have an account? <span className="cursor-pointer text-sm text-blue-600" onClick={() => window.location.href='/SignUp'}>Join free today</span></p>
           </form>
         </div>
       </div>

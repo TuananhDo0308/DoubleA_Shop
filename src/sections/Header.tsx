@@ -49,7 +49,7 @@ export const Navbar = ({onSignInClick, onAvatarClick }) => {
               <div className="flex items-center space-x-2">
                 <button onClick={onAvatarClick} className="focus:outline-none">
                   <Image
-                    src={`${IMG_URL}/${user?.strimg}` } // Dùng avatar của user hoặc avatar mặc định
+                    src={user?.strimg ? `${IMG_URL}/${user?.strimg}` : DefaultAvatar.src} // Sử dụng avatar user hoặc avatar mặc định
                     alt="User Avatar"
                     width={40}
                     height={40}
@@ -65,6 +65,7 @@ export const Navbar = ({onSignInClick, onAvatarClick }) => {
                 Sign In
               </button>
             )}
+
           </nav>
         </div>
       </div>

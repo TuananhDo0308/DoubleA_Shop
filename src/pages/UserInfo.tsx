@@ -16,7 +16,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-opacity-50 flex justify-center items-center">
-      <div className="relative w-full h-full bg-blue-600 shadow-lg overflow-y-auto">
+      <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
         <button
           onClick={() => setShowUserInfo(false)}
           className="absolute top-4 left-4 z-50 text-xl font-bold text-white mb-8 bg-blue-700 px-5 py-2 rounded-xl hover:bg-blue-500"

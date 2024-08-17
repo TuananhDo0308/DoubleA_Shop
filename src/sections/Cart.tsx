@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { IMG_URL } from "@/services/LinkAPI";
 import { useMeasure } from "@react-hookz/web";
 import {
   useDragControls,
@@ -94,7 +94,7 @@ export const DragCloseDrawerExample = ({ onCheckoutClick }) => {
                 >
                   <div className="relative w-full h-60 sm:w-40 sm:h-40">
                     <Image
-                      src={`/path/to/your/image/${product.str_masp}.jpg`} // Replace with correct image path
+                      src={`${IMG_URL}/${product.strimg}`} // Replace with correct image path
                       alt={product.str_tensp}
                       className="object-cover rounded-lg"
                       layout="fill"

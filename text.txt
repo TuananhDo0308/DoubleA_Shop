@@ -1,13 +1,16 @@
+
 {
+  "homepage": "https://TuananhDo0308.github.io/DoubleA_Shop",
   "name": "light-saas-landing-page",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "predeploy": "npm run export",
+    "deploy": "gh-pages -d out",
     "start": "next start",
-    "lint": "next lint"
-  },
+    "build": "next build",
+    "export": "next build && next export"
+  }
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@react-hookz/web": "^24.0.4",
@@ -34,8 +37,3 @@
     "typescript": "^5"
   }
 }
-
-
-
-
-

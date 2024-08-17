@@ -113,7 +113,7 @@ export default function CheckoutPage({ setShowCheckout }) {
                     <div key={product.str_masp} className="flex flex-col rounded-lg bg-white sm:flex-row">
                       <Image
                         className="m-2 h-24 w-28 rounded-md border object-cover object-center"
-                        src={'/path/to/your/image/${method.strimg}.jpg'}
+                        src={`${IMG_URL}/${product?.strimg}`} 
                         alt={product.str_tensp}
                         width={112}
                         height={96}

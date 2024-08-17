@@ -310,7 +310,7 @@ const StepFour = () => {
           />
           <div className="flex items-center justify-center">
             {profilePicture ? (
-              <img
+              <Image
                 src={URL.createObjectURL(profilePicture)}
                 alt="Profile Preview"
                 className="w-32 h-32 rounded-full object-cover cursor-pointer"

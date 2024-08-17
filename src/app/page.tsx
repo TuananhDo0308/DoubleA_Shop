@@ -38,9 +38,6 @@ export default function Home() {
     setShowEditModal(false); // Hide edit modal
   };
 
-  const handleUserUpdate = (updatedUser) => {
-    // Handle user update (set in AuthContext or handle however necessary)
-  };
 
   return (
     <AuthProvider>
@@ -80,7 +77,7 @@ export default function Home() {
         
         {/* Include the UserEditModal in the layout */}
         {showEditModal && (
-          <UserEditModal user={user} onUserUpdate={handleUserUpdate} onClose={handleCloseEditModal} />
+          <UserEditModal onClose={handleCloseEditModal} />
         )}
       </div>
     </AuthProvider>

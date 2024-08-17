@@ -32,7 +32,7 @@ export const Hero = () => {
           Welcome to the future of hydration! 
           Our automated bottled water vending service 
           ensures you stay refreshed with just a few clicks. 
-          Whether you're at home, in the office, or on the go, 
+          Whether you&apos;re at home, in the office, or on the go, 
           our smart vending machines deliver premium quality bottled 
           water directly to you. Say goodbye to the hassle of traditional 
           vending and embrace convenience and sustainability with DoubleA.

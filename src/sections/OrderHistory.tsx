@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { getHistory } from "@/services/signUpAPI"; // API lấy lịch sử đơn hàng
+import { IMG_URL } from "@/services/LinkAPI";
 
 export const OrderHistory = () => {
   const { user } = useAuth();
@@ -97,7 +98,7 @@ export const OrderHistory = () => {
                     <tr key={idx} className="border-t">
                       <td className="flex items-center py-4 px-4">
                         <Image
-                          src={detail.Product.strimg || '/path/to/default-image.jpg'}
+                          src={`${IMG_URL}/${detail.Product.strimg}`}
                           alt={detail.Product.str_tensp}
                           width={60}
                           height={60}
