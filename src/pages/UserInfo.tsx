@@ -7,7 +7,7 @@ import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
 import { FaSignOutAlt } from "react-icons/fa"; 
 import { motion } from "framer-motion";
-
+import ConfirmDialog from "@/components/ConfirmBox";
 interface UserInfoProps {
   setShowUserInfo: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenEditModal: () => void;
@@ -16,6 +16,26 @@ interface UserInfoProps {
 export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoProps) {
   const { user, signOut } = useAuth(); 
   const [selectedTab, setSelectedTab] = useState("OrderHistory");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleAction = () => {
+    // Open the dialog before taking action
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirm = () => {
+    // User confirmed the action
+    setIsDialogOpen(false);
+    handleLogout();
+    // Proceed with the action, e.g., place an order, delete an item, etc.
+    console.log("Action confirmed");
+  };
+
+  const handleCancel = () => {
+    // User canceled the action
+    setIsDialogOpen(false);
+  };
+
 
   const handleLogout = () => {
     signOut(); 
@@ -32,7 +52,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
           &larr; Back
         </button>
         <button
-          onClick={handleLogout}
+          onClick={handleAction}
           className="absolute top-5 right-5 z-50"
           type="button"
         >
@@ -165,6 +185,13 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        title="Confirm Action"
+        message="Are you sure you want to log out?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </div>
   );
 }

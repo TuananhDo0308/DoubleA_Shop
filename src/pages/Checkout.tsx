@@ -9,15 +9,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { IMG_URL } from "@/services/LinkAPI";
-interface Order {
-  userId: string;
-  payId: string;
-  email: string;
-  name: string;
-  phoneNumber: string;
-  billingAddress: string;
-  total: number;
-}
+import ConfirmDialog from "@/components/ConfirmBox"; // Import the ConfirmDialog component
 
 // Define the form data interface
 interface OrderFormData {
@@ -45,8 +37,8 @@ export default function CheckoutPage({
   const [paymentCost, setPaymentCost] = useState<number>(0);
   const { user, cart, setCart } = useAuth();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Initialize form methods with react-hook-form
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email address").required("Email is required"),
     name: yup.string().required("Name is required"),
@@ -95,8 +87,9 @@ export default function CheckoutPage({
   const subtotal = cart.reduce((acc, product) => acc + product.d_don_gia * product.i_so_luong, 0);
   const sub = subtotal * (1 + vatRate);
   const total = (sub + paymentCost).toFixed(1); // Ensuring only one decimal place
+
   const handlePlaceOrder = async (data: OrderFormData) => {
-    const orderData: Order = {
+    const orderData = {
       userId: user.str_mand, // User ID
       payId: paymentMethod || "", // Payment ID
       email: data.email,
@@ -107,12 +100,8 @@ export default function CheckoutPage({
     };
   
     try {
-      // Call API to place the order
       const response = await placeOrder(orderData);
-      console.log("Order placed successfully:", response);
-      alert("Order placed successfully!");
-  
-      // Clear the cart in AuthContext
+      console.log("Order placed successfully:", response);  
       setCart([]); // Clear the cart
   
       setShowCheckout(false); // Close the checkout page
@@ -121,7 +110,23 @@ export default function CheckoutPage({
       alert("Failed to place order. Please try again.");
     }
   };
-  
+
+  const onSubmit = (data: OrderFormData) => {
+    // Show confirmation dialog before placing the order
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    // Handle the actual order placement after confirmation
+    setIsDialogOpen(false);
+    handleSubmit(handlePlaceOrder)();
+  };
+
+  const handleCancel = () => {
+    // Close the confirmation dialog without placing the order
+    setIsDialogOpen(false);
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 w-full flex justify-center items-center">
       <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
@@ -156,7 +161,7 @@ export default function CheckoutPage({
                 </div>
               </div>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(handlePlaceOrder)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mt-10 bg-gray-50 px-4 pt-8 lg:mt-0">
                 <p className="mt-8 text-lg font-medium">Payment Methods</p>
                 <div className="mt-5 grid gap-6">
@@ -288,6 +293,15 @@ export default function CheckoutPage({
           </FormProvider>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        title="Confirm Order"
+        message={`Are you sure you want to place this order for ${total}$?`}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </div>
   );
 }

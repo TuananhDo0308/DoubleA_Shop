@@ -12,6 +12,7 @@ export const ListProducts: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<ProductType[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Add state for search query
 
   useEffect(() => {
     fetchCategories();
@@ -40,19 +41,34 @@ export const ListProducts: React.FC = () => {
     }
   };
 
-  // Filter products based on selected category
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(product => product.str_malh === selectedCategory);
+  // Filter products based on selected category and search query
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = selectedCategory === 'All' || product.str_malh === selectedCategory;
+    const matchesSearch = product.str_tensp.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div>
+      {/* Search Input */}
+      
+    <div className="flex justify-between">
       {/* Chip Tabs for Category selection */}
       <ChipTabs 
         categories={categories} 
         selectedCategory={selectedCategory} 
         setSelectedCategory={setSelectedCategory} 
       />
+      <div className="px-36 py-6 flex justify-between items-center">
+        <input 
+          type="text"
+          placeholder="Search for products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 border rounded-md w-96"
+        />
+      </div>
+      </div>
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 sm:grid-cols-1 lg:grid-cols-4 gap-4 px-32">
         {filteredProducts.map((product) => (
