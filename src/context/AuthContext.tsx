@@ -7,7 +7,7 @@ interface AuthProviderProps {
 interface AuthContextType {
   user: any; // Bạn có thể tùy chỉnh kiểu cho user nếu có
   cart: any[];
-  signIn: (userData: any, cartData: any) => void;
+  signIn: (userData: any) => void;
   signOut: () => void;
   setCart: React.Dispatch<React.SetStateAction<any[]>>;
   setUser: React.Dispatch<React.SetStateAction<any>>;
@@ -41,13 +41,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // Hàm đăng nhập, thiết lập user và cart
-  const signIn = (userData: any, cartData: any) => {
+  const signIn = (userData: any) => {
     setUser(userData);
-    setCart(cartData?.CartDetails || []); // Đảm bảo cart luôn là mảng
 
     // Lưu trữ vào localStorage
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("cart", JSON.stringify(cartData?.CartDetails || []));
   };
 
   // Hàm đăng xuất, xóa bỏ dữ liệu user và cart

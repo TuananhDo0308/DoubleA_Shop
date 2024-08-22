@@ -17,21 +17,6 @@ interface Order {
   phoneNumber: string;
   billingAddress: string;
   total: number;
-  cart: {
-    str_masp: string;
-    i_so_luong: number;
-    d_don_gia: number;
-    strimg: string;
-    str_tensp: string;
-  }[];
-  ldt_ngay_dat: Date;
-  ld_ngay_giao: Date | null;
-  d_tong: number;
-  str_tinh_trang: string;
-  BillDetails: {
-    productId: string;
-    quantity: number;
-  }[];
 }
 
 // Define the form data interface
@@ -119,21 +104,6 @@ export default function CheckoutPage({
       phoneNumber: data.phoneNumber,
       billingAddress: data.billingAddress,
       total: parseFloat(total), // Convert total to number
-      cart: cart.map((product) => ({
-        str_masp: product.str_masp,
-        i_so_luong: product.i_so_luong,
-        d_don_gia: product.d_don_gia,
-        strimg: product.strimg,
-        str_tensp: product.str_tensp,
-      })),
-      ldt_ngay_dat: new Date(), // Order date
-      ld_ngay_giao: null, // Set delivery date to null for now
-      d_tong: parseFloat(total), // Total amount
-      str_tinh_trang: "Pending", // Initial order status
-      BillDetails: cart.map((product) => ({
-        productId: product.str_masp,
-        quantity: product.i_so_luong,
-      })),
     };
   
     try {

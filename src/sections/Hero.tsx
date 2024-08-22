@@ -6,16 +6,18 @@ import noodleImage from '@/assets/products/cup1.png'
 import {motion,useScroll,useTransform} from "framer-motion"
 import { useRef } from "react";
 import { getPayments } from "@/services/checkoutAPI";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SlideInNotifications from "@/components/Message";
+import { getCart } from "@/services/cartAPI";
+import { useAuth } from "@/context/AuthContext";
 export const Hero = () => {
-
+  
   const Heroref= useRef(null);
   const {scrollYProgress} =useScroll({
     target:Heroref,
     offset: ["start end","end start"]
   })
- 
+
   const translateY = useTransform(scrollYProgress ,[0,1],[150,-150])
   return <section 
   className="pt-0 pb-20  md:pt-0 md:pb-10 bg-[radial-gradient(ellipse_200%_100%_at_bottom_left,#183EC2,#EAEEFE_100%)] overflow-x-clip" style={{ paddingTop: '80px' }}

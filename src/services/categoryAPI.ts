@@ -6,3 +6,8 @@ export const getCategories = async () => {
     console.log(response.data)
     return response.data;
 };
+export const getSupplier = async () => {
+    const response = await axios.post(`${API_URL}/admin/supplier/getSupplier`);
+    console.log("ok:",response.data)
+    return response.data;
+};

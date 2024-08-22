@@ -7,5 +7,16 @@ export interface ProductType {
   d_don_gia: number;     // Price
   strimg?: string;       // Image URL (optional)
   str_malh: string;      // Category ID
-  str_mancc: string;     // Supplier ID
+  str_mancc: string;   
+  txt_mo_ta:string  // Supplier ID
+}
+
+export interface Supplier {
+  str_mancc: string;
+  str_tenncc: string;
+}
+
+export interface Category {
+  str_malh: string;
+  str_tenlh: string;
 }

@@ -39,7 +39,12 @@ export const loginUser = async (credentials: SignInFormData) => {
 
 // Get the order history for a user
 export const getHistory = async (userId:userIdType) => {
-  const response = await axios.post(`${API_URL}/getOrder`, userId);
+  const response = await axios.post(`${API_URL}/user/order/getProcessingOrders`, userId);
+  console.log("Received:", response.data);
+  return response.data;
+};
+export const getHistoryCompleted = async (userId:userIdType) => {
+  const response = await axios.post(`${API_URL}/user/order/getCompletedOrders`, userId);
   console.log("Received:", response.data);
   return response.data;
 };
@@ -47,10 +52,18 @@ export const getHistory = async (userId:userIdType) => {
 // Update a user's profile with multipart/form-data
 export const updateProfile = async (user: FormData) => {
   console.log("User Data", user);
-  const response = await axios.post(`${API_URL}/users/updateProfile`, user, {
+  const response = await axios.put(`${API_URL}/users/updateProfile`, user, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+};
+
+export const getOrderDetail = async (Id: string) => {
+  const response = await axios.post(`${API_URL}/admin/order/getOrderDetail`,{
+      orderId: Id
+  });
+  console.log(response.data)
   return response.data;
 };

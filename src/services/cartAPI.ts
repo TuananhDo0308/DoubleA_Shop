@@ -33,3 +33,10 @@ export const updateCart = async (userId: string,productId: string, newQuantity: 
     console.log(response.data)
     return response.data;
 };
+export const getCart = async (userId: string) => {
+    const response = await axios.post(`${API_URL}/cart/getCart`,
+        {userId
+        });
+    console.log(response.data)
+    return response.data;
+};

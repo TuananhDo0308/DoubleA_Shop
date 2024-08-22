@@ -45,7 +45,7 @@ const SignIn: React.FC<SignInProps> = ({ setShowSignIn }) => {
       console.log("Image URL:", response.user.strimg);
       
       // Use signIn function from context
-      signIn(response.user, response.cart);
+      signIn(response.user);
 
       // Close the SignIn form after successful login
       setShowSignIn(false);

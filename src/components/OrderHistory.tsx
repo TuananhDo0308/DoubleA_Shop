@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { getHistory } from "@/services/signUpAPI"; // API to get order history
-import { IMG_URL } from "@/services/LinkAPI";
+import OrderProductList from "@/components/ListProduct"; // Import the new component
 
 interface OrderDetail {
   Product: {
@@ -14,6 +13,7 @@ interface OrderDetail {
 }
 
 interface Order {
+  str_mahd: string; // Added order ID field
   str_ho_ten?: string;
   strsdt?: string;
   str_dia_chi_nhan?: string;
@@ -21,14 +21,14 @@ interface Order {
   ld_ngay_giao?: string;
   d_tong?: number;
   str_tinh_trang?: string;
-  BillDetails?: OrderDetail[];
+  OrderDetails?: OrderDetail[];
 }
 
 export const OrderHistory = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [visibleInvoices, setVisibleInvoices] = useState<string[]>([]); // State to manage visible invoices
 
-  // Fetch orders and set them into state
   const fetchHistoryOrders = async () => {
     try {
       if (!user?.str_mand) {
@@ -42,9 +42,8 @@ export const OrderHistory = () => {
 
       const response = await getHistory(sendInfo);
 
-      // Ensure response is an array
-      if (Array.isArray(response)) {
-        setOrders(response as Order[]); // Cast to Order[]
+      if (Array.isArray(response.orders)) {
+        setOrders(response.orders as Order[]);
       } else {
         console.error("Unexpected response structure:", response);
       }
@@ -59,6 +58,14 @@ export const OrderHistory = () => {
     }
   }, [user?.str_mand]);
 
+  const toggleInvoiceVisibility = (orderId: string) => {
+    setVisibleInvoices(prevState =>
+      prevState.includes(orderId)
+        ? prevState.filter(id => id !== orderId)
+        : [...prevState, orderId]
+    );
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6">Order History</h1>
@@ -68,7 +75,6 @@ export const OrderHistory = () => {
       {orders.length > 0 ? (
         orders.map((order, index) => (
           <div key={index} className="mb-10 border rounded-lg p-4 shadow-sm">
-            {/* Customer information */}
             <div className="mb-4">
               <p className="text-lg font-medium">Customer Information</p>
               <p className="text-gray-700">
@@ -85,7 +91,6 @@ export const OrderHistory = () => {
               </p>
             </div>
 
-            {/* Order details */}
             <div className="flex justify-between items-center mb-4">
               <div>
                 <p className="text-sm text-gray-500">Order Date</p>
@@ -99,51 +104,22 @@ export const OrderHistory = () => {
                 <p className="text-sm text-gray-500">Total amount</p>
                 <p className="text-lg font-medium">{order.d_tong ? `${order.d_tong}$` : "N/A"}</p>
               </div>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-                View Invoice
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                onClick={() => toggleInvoiceVisibility(order.str_mahd)} // Toggle visibility
+              >
+                {visibleInvoices.includes(order.str_mahd) ? "Hide Invoice" : "View Invoice"}
               </button>
             </div>
 
-            {/* Order status */}
             <p className="text-sm text-gray-500">Status</p>
             <p className={`text-lg font-medium mb-4 ${order.str_tinh_trang === "Delivered" ? "text-green-600" : "text-red-600"}`}>
               {order.str_tinh_trang || "Unknown"}
             </p>
 
-            {/* Product details */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left py-2 px-4 font-medium text-gray-600">Product</th>
-                    <th className="text-left py-2 px-4 font-medium text-gray-600">Quantity</th>
-                    <th className="text-left py-2 px-4 font-medium text-gray-600">Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {order.BillDetails?.map((detail, idx) => (
-                    <tr key={idx} className="border-t">
-                      <td className="flex items-center py-4 px-4">
-                        {detail.Product?.strimg ? (
-                          <Image
-                            src={`${IMG_URL}/${detail.Product.strimg}`}
-                            alt={detail.Product?.str_tensp || "Product Image"}
-                            width={60}
-                            height={60}
-                            className="mr-4 rounded-md border object-cover object-center"
-                          />
-                        ) : (
-                          <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">No Image</div>
-                        )}
-                        <p>{detail.Product?.str_tensp || "Unknown Product"}</p>
-                      </td>
-                      <td className="py-4 px-4">{detail.i_so_luong || "N/A"}</td>
-                      <td className="py-4 px-4">{detail.Product?.d_don_gia ? `${detail.Product.d_don_gia}$` : "N/A"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {visibleInvoices.includes(order.str_mahd) && (
+              <OrderProductList orderId={order.str_mahd}/> // Pass orderId to component
+            )}
           </div>
         ))
       ) : (

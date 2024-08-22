@@ -1,12 +1,12 @@
-"use client";
 import React, { useRef, useState } from "react";
 import { ProductType } from "@/types/Product";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext"; // Import useAuth to access the cart
+import { useAuth } from "@/context/AuthContext";
 import { addToCart } from "@/services/cartAPI";
-import SlideInNotifications from "./Message"; // Import SlideInNotifications
+import SlideInNotifications from "./Message";
 import { IMG_URL } from "@/services/LinkAPI";
+import ProductDetailModal from "./DetailProduct"; // Import the ProductDetailModal component
 
 interface ProductProps {
   product: ProductType;
@@ -18,13 +18,14 @@ interface Notification {
 }
 
 export const Product: React.FC<ProductProps> = ({ product }) => {
-  const { cart, setCart, user } = useAuth(); // Combine useAuth to access cart and user
-  const [notifications, setNotifications] = useState<Notification[]>([]); // State for notifications with type
+  const { cart, setCart, user } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
 
   const handleAddToCart = async () => {
     try {
-      const productInCart = cart.find(item => item === product.str_masp);
-      const desiredQuantity = productInCart ? productInCart + 1 : 1;
+      const productInCart = cart.find(item => item.str_masp === product.str_masp);
+      const desiredQuantity = productInCart ? productInCart.i_so_luong + 1 : 1;
 
       if (product.i_so_luong < desiredQuantity) {
         setNotifications(prev => [
@@ -34,17 +35,15 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
         return;
       }
 
-      // Thêm sản phẩm vào cơ sở dữ liệu
       await addProductToCartInDB();
 
-      // Thêm thông báo khi sản phẩm được thêm vào giỏ hàng
       setNotifications(prev => [
         { id: Math.random(), message: `${product.str_tensp} added to cart` },
         ...prev
       ]);
 
       const updatedCart = getUpdatedCart();
-      setCart(updatedCart); // Cập nhật giỏ hàng trong AuthContext
+      setCart(updatedCart);
     } catch (error) {
       setNotifications(prev => [
         { id: Math.random(), message: 'Error adding product to cart' },
@@ -55,7 +54,7 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
 
   const addProductToCartInDB = async () => {
     try {
-      await addToCart(user.str_mand, product.str_masp); // Gọi API để thêm sản phẩm vào giỏ hàng
+      await addToCart(user.str_mand, product.str_masp);
     } catch (error) {
       setNotifications(prev => [
         { id: Math.random(), message: "Failed to add product to cart." },
@@ -81,10 +80,18 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     setNotifications(prevNotifs => prevNotifs.filter(n => n.id !== id));
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="p-4">
-      <SlideInNotifications notifications={notifications} removeNotif={removeNotif} /> {/* Pass notifications and removeNotif */}
-      <div className="w-full">
+      <SlideInNotifications notifications={notifications} removeNotif={removeNotif} />
+      <div className="w-full" onClick={handleOpenModal}> {/* Click to open the modal */}
         <TiltCard imageSrc={`${IMG_URL}/${product.strimg}`} altText={product.str_tensp} />
       </div>
       <h3 className="mt-2 text-lg font-extrabold uppercase px-4">{product.str_tensp}</h3>
@@ -97,24 +104,28 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
           <p className="mt-1 font-bold text-lg text-blue-600">${product.d_don_gia.toFixed(2)}</p>
         </div>
         <button
-          onClick={handleAddToCart} // Call the function to add the product to the cart
+          onClick={handleAddToCart}
           className="rounded-2xl mt-2 border-black bg-white px-4 py-2 font-semibold text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:rounded-md hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:rounded-2xl active:shadow-none"
         >
           Add
         </button>
       </div>
+
+      {isModalOpen && (
+        <ProductDetailModal product={product} onClose={handleCloseModal} onAddToCart={handleAddToCart} />
+      )}
     </div>
   );
 };
+
 interface TiltCardProps {
-  imageSrc: string; // Đường dẫn đến hình ảnh là chuỗi
-  altText: string;  // Văn bản thay thế cũng là chuỗi
+  imageSrc: string;
+  altText: string;
 }
 
 const ROTATION_RANGE = 32.5;
 const HALF_ROTATION_RANGE = ROTATION_RANGE / 2;
 
-// Sửa đổi TiltCard để nhận props với kiểu xác định
 const TiltCard: React.FC<TiltCardProps> = ({ imageSrc, altText }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 

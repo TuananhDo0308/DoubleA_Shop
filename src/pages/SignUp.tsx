@@ -346,6 +346,8 @@ const StepFour = () => {
           {profilePicture ? (
             <Image
               src={URL.createObjectURL(profilePicture as File)}
+              width={200}
+              height={200}
               alt="Profile Preview"
               className="w-32 h-32 rounded-full object-cover cursor-pointer"
               onClick={() => document.getElementById("profilePictureInput")?.click()}
@@ -353,6 +355,8 @@ const StepFour = () => {
           ) : (
             <Image
               src={defaultImage}
+              width={200}
+              height={200}
               alt="Default Profile"
               className="w-32 h-32 rounded-full object-cover cursor-pointer"
               onClick={() => document.getElementById("profilePictureInput")?.click()}

@@ -13,21 +13,6 @@ interface Order {
     phoneNumber: string;
     billingAddress: string;
     total: number;
-    cart: {
-      str_masp: string;
-      i_so_luong: number;
-      d_don_gia: number;
-      strimg: string;
-      str_tensp: string;
-    }[];
-    ldt_ngay_dat: Date;
-    ld_ngay_giao: Date | null;
-    d_tong: number;
-    str_tinh_trang: string;
-    BillDetails: {
-      productId: string;
-      quantity: number;
-    }[];
   }
   
   export const placeOrder = async (orderData: Order) => {

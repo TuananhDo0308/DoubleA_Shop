@@ -1,10 +1,12 @@
-import React from "react";
-import { OrderHistory } from "@/sections/OrderHistory"; // Adjust the import path accordingly
+import React, { useState } from "react";
+import { OrderHistory } from "@/components/OrderHistory"; 
+import { OrderHistory2 } from "@/components/OrderHistoryCompleted"; 
 import { useAuth } from "@/context/AuthContext";
-import DefaultAvatar from "@/assets/avatar-2.png"; // Path to default avatar image
+import DefaultAvatar from "@/assets/avatar-2.png"; 
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
-import { FaSignOutAlt } from "react-icons/fa"; // Import the logout icon
+import { FaSignOutAlt } from "react-icons/fa"; 
+import { motion } from "framer-motion";
 
 interface UserInfoProps {
   setShowUserInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,11 +14,12 @@ interface UserInfoProps {
 }
 
 export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoProps) {
-  const { user, signOut } = useAuth(); // Lấy hàm logout từ AuthContext
+  const { user, signOut } = useAuth(); 
+  const [selectedTab, setSelectedTab] = useState("OrderHistory");
 
   const handleLogout = () => {
-    signOut(); // Gọi hàm logout
-    setShowUserInfo(false); // Đóng cửa sổ UserInfo
+    signOut(); 
+    setShowUserInfo(false); 
   };
 
   return (
@@ -29,13 +32,13 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
           &larr; Back
         </button>
         <button
-          onClick={handleLogout} // Call the logout function on click
+          onClick={handleLogout}
           className="absolute top-5 right-5 z-50"
           type="button"
         >
-          <FaSignOutAlt className="text-white hover:text-gray-300 w-9 h-9" /> {/* Icon for logout */}
+          <FaSignOutAlt className="text-white hover:text-gray-300 w-9 h-9" />
         </button>
-        {/* User Profile Section */}
+
         <div className="relative block h-64">
           <div
             className="absolute top-0 w-full h-full bg-center bg-cover"
@@ -44,10 +47,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
                 "url('https://images.unsplash.com/photo-1604856420566-576ba98b53cd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
             }}
           >
-            <span
-              id="blackOverlay"
-              className="w-full h-full absolute opacity-50 bg-black"
-            ></span>
+            <span id="blackOverlay" className="w-full h-full absolute opacity-50 bg-black"></span>
           </div>
           <div
             className="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-20"
@@ -87,7 +87,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
                   <div className="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
                     <div className="py-6 px-3 mt-32 sm:mt-0">
                       <button
-                        onClick={onOpenEditModal} // Trigger modal when clicking edit
+                        onClick={onOpenEditModal}
                         className="bg-black hover:bg-gray-800 rounded-md mr-3 font-medium text-lg text-white px-5 py-2"
                         type="button"
                       >
@@ -123,9 +123,42 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
                   </div>
                 </div>
 
-                {/* Order History Section */}
+                {/* Tab Navigation for Order History */}
+                <div className="px-36 py-6 flex items-center flex-wrap gap-2 justify-center">
+                  <TabButton
+                    text="Processing Orders"
+                    selected={selectedTab === "OrderHistory"}
+                    onClick={() => setSelectedTab("OrderHistory")}
+                  />
+                  <TabButton
+                    text="Order History"
+                    selected={selectedTab === "OrderHistory2"}
+                    onClick={() => setSelectedTab("OrderHistory2")}
+                  />
+                </div>
+
+                {/* Render selected tab content */}
                 <div className="mt-10 py-10 border-t border-gray-200">
-                  <OrderHistory />
+                  {selectedTab === "OrderHistory" && (
+                    <motion.div
+                      key="OrderHistory"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                    >
+                      <OrderHistory />
+                    </motion.div>
+                  )}
+                  {selectedTab === "OrderHistory2" && (
+                    <motion.div
+                      key="OrderHistory2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                    >
+                      <OrderHistory2 />
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </div>
@@ -135,3 +168,32 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
     </div>
   );
 }
+
+// Component for individual Tab Button
+interface TabButtonProps {
+  text: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+const TabButton: React.FC<TabButtonProps> = ({ text, selected, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`${
+        selected
+          ? "text-white font-black"
+          : "text-slate-800 hover:text-slate-900 hover:bg-slate-300"
+      } text-base transition-colors px-5 py-2 rounded-md relative`}
+    >
+      <span className="relative z-10">{text}</span>
+      {selected && (
+        <motion.span
+          layoutId="pill-tab"
+          transition={{ type: "spring", duration: 0.5 }}
+          className="absolute inset-0 z-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md"
+        />
+      )}
+    </button>
+  );
+};
