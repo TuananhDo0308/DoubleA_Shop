@@ -33,7 +33,18 @@ const SignUp = () => {
   const validateStep = () => {
     const values = getValues();
     clearErrors();
-
+  
+    const calculateAge = (dob: string) => {
+      const birthDate = new Date(dob);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        return age - 1;
+      }
+      return age;
+    };
+  
     if (currentStep === 0) {
       if (!values.firstName) {
         setError("firstName", { type: "manual", message: "First Name is required" });
@@ -45,6 +56,10 @@ const SignUp = () => {
       }
       if (!values.dob) {
         setError("dob", { type: "manual", message: "Date of Birth is required" });
+        return false;
+      }
+      if (calculateAge(values.dob) < 10) {
+        setError("dob", { type: "manual", message: "You must be at least 10 years old" });
         return false;
       }
       if (!values.gender) {
@@ -79,9 +94,10 @@ const SignUp = () => {
         return false;
       }
     }
-
+  
     return true;
   };
+  
   const onSubmit = async (data: UserFormData) => {
     try {
       const formData: UserFormData = {

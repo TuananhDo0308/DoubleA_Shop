@@ -1,5 +1,5 @@
 "use client";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -8,39 +8,33 @@ import { useAuth } from "@/context/AuthContext"; // Import useAuth from AuthCont
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
 
-
-// Validation schema for the form
 const schema = yup.object().shape({
   str_ho_ten: yup.string().required("Name is required"),
   str_email: yup.string().email("Invalid email address").required("Email is required"),
-  strsdt: yup.string().required("Phone number is required"),
+  strsdt: yup.string().matches(/^\d{10}$/, "Phone number must be exactly 10 digits").required("Phone number is required"),
   str_dia_chi: yup.string().required("Address is required"),
-  ld_ngay_sinh: yup.date().required("Date of Birth is required").nullable(),
+  ld_ngay_sinh: yup.date().nullable().required("Date of Birth is required")
+    .test("age", "You must be at least 10 years old", function(value) {
+      const today = new Date();
+      const birthDate = new Date(value);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      return age >= 10;
+    }),
   profilePicture: yup.mixed().notRequired(),
 });
 
-interface Edit {
-  onClose: () => void;
-}
+export default function UserEditModal({ onClose }) {
+  const { user, setUser } = useAuth(); 
 
-export default function UserEditModal({ onClose }: Edit) {
-  const { user, setUser } = useAuth(); // Get the user and setUser from the AuthContext
-
-  // Safely parse the date, if available
-  const parsedDate = user?.ld_ngay_sinh && !isNaN(Date.parse(user.ld_ngay_sinh))
-    ? new Date(user.ld_ngay_sinh)
-    : null; // Return null if the date is invalid
-
-  // Initialize form methods with react-hook-form
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      str_ho_ten: user?.str_ho_ten || "",
-      str_email: user?.str_email || "",
-      strsdt: user?.strsdt || "",
-      str_dia_chi: user?.str_dia_chi || "",
-      ld_ngay_sinh: parsedDate, // Pass a Date object or null
-      profilePicture: null, // Start with no new file selected
+      str_ho_ten: "",
+      str_email: "",
+      strsdt: "",
+      str_dia_chi: "",
+      ld_ngay_sinh: undefined,
+      profilePicture: null,
     },
     mode: "onTouched",
   });
@@ -48,30 +42,40 @@ export default function UserEditModal({ onClose }: Edit) {
   const { handleSubmit, setValue, watch, formState: { errors } } = methods;
   const profilePicture = watch("profilePicture");
 
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (user) {
+      setValue("str_ho_ten", user.str_ho_ten || "");
+      setValue("str_email", user.str_email || "");
+      setValue("strsdt", user.strsdt || "");
+      setValue("str_dia_chi", user.str_dia_chi || "");
+      setValue("ld_ngay_sinh", user.ld_ngay_sinh|| undefined);
+    }
+  }, [user, setValue]);
+
+  const handleProfilePictureChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setValue("profilePicture", file);
     }
   };
-  const onSubmit = async (data: any) => {
+
+  const onSubmit = async (data:any) => {
     try {
-      const formData = new FormData(); // Web API FormData object
+      const formData = new FormData(); 
       formData.append("userID", user.str_mand);
       formData.append("newName", data.str_ho_ten);
       formData.append("email", data.str_email);
-      formData.append("password", user.str_mat_khau); // Keep the current password
+      formData.append("password", user.str_mat_khau);
       formData.append("phone", data.strsdt);
-      formData.append("dob", data.ld_ngay_sinh?.toISOString().substring(0, 10)); // Convert date to string
+      formData.append("dob", data.ld_ngay_sinh?.toISOString().substring(0, 10)); 
       formData.append("address", data.str_dia_chi);
   
       if (data.profilePicture instanceof File) {
-        formData.append("profilePicture", data.profilePicture); // Append file if exists
+        formData.append("profilePicture", data.profilePicture); 
       }
   
-      const response = await updateProfile(formData); // Ensure updateProfile accepts FormData
+      const response = await updateProfile(formData); 
   
-      // Update user data locally
       const updatedUser = {
         ...user,
         str_ho_ten: data.str_ho_ten,
@@ -79,17 +83,16 @@ export default function UserEditModal({ onClose }: Edit) {
         strsdt: data.strsdt,
         ld_ngay_sinh: response.user.ld_ngay_sinh,
         str_dia_chi: data.str_dia_chi,
-        strimg: response.user.strimg || user.strimg, // Use updated image or fallback to current one
+        strimg: response.user.strimg || user.strimg,
       };
       setUser(updatedUser);
   
-      onClose(); // Close modal after success
+      onClose(); 
     } catch (error) {
       console.error("Failed to update profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
-  
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">

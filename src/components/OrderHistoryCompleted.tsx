@@ -123,7 +123,7 @@ export const OrderHistory2 = () => {
           </div>
         ))
       ) : (
-        <p className="text-gray-600">No completed orders2 found.</p>
+        <p className="text-gray-600">No completed orders found.</p>
       )}
     </div>
   );
