@@ -23,7 +23,7 @@ const schema = yup.object().shape({
   profilePicture: yup.mixed().notRequired(),
 });
 
-export default function UserEditModal({ onClose }) {
+export default function UserEditModal({ onClose }: { onClose: () => void }) {
   const { user, setUser } = useAuth(); 
 
   const methods = useForm({
@@ -52,7 +52,7 @@ export default function UserEditModal({ onClose }) {
     }
   }, [user, setValue]);
 
-  const handleProfilePictureChange = (e) => {
+  const handleProfilePictureChange = (e:any) => {
     const file = e.target.files?.[0];
     if (file) {
       setValue("profilePicture", file);
