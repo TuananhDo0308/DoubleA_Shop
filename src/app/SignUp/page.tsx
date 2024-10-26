@@ -21,8 +21,9 @@ interface UserFormData {
   profilePicture: File | null;
 }
 
-const SignUp = () => {
+export default function SignUp () {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter();
 
   const methods = useForm<UserFormData>({
     mode: "onTouched",
@@ -98,7 +99,6 @@ const SignUp = () => {
   };
   
   const onSubmit = async (data: UserFormData) => {
-    const router = useRouter();
 
     try {
       const formData: UserFormData = {
@@ -116,7 +116,7 @@ const SignUp = () => {
       
       //const response = await registerUser(formData); // Assuming registerUser expects FormData (your custom interface)
       //console.log("Final Data:", response);
-      router.push("/"); // Chuyển hướng về trang chủ hoặc bất kỳ URL nào
+      router.push("/"); 
     } catch (error: any) {
       console.error(error);
       alert(error.message || "Error occurred while signing up.");
@@ -381,4 +381,3 @@ const StepFour = () => {
   );
 };
 
-export default SignUp;
