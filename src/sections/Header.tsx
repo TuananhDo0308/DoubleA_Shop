@@ -37,15 +37,15 @@ export default function Navbar () {
 
           {/* Navbar */}
           <nav className="flex gap-6 text-black/60 items-center">
-            <button className="topNav" >
+            <a href="#hero" className="topNav" >
               Home
-            </button>
-            <button className="topNav" >
+            </a>
+            <a href="#about-us" className="topNav" >
               About Us
-            </button>
-            <button className="topNav" >
+            </a>
+            <a href="#shop" className="topNav" >
               Shop
-            </button>
+            </a>
             {user.isAuth? (
               <div className="flex items-center space-x-2">
                 <Link href="/UserProfile">
