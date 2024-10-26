@@ -6,7 +6,7 @@ import { LogoTicker } from "@/sections/LogoTicker";
 import { SwipeCarousel } from "@/sections/Carousel";
 import { TextParallaxContentExample } from "@/sections/AboutUs";
 import Cartbutton from "@/sections/Cart/Cart";
-import SignIn from "@/pages/SignIn";
+import SignIn from "@/components/SignIn";
 import CheckoutPage from "@/app/Checkout/page";
 import { Footer } from "@/sections/Footer";
 
