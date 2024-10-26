@@ -9,7 +9,7 @@ import Drawer from "./CartDrawer";
 import { useDispatch } from "react-redux";
 import { changeStatus } from "@/app/GlobalRedux/Features/cartUiSlice";
 export const CartButton: React.FC = () => {
-  const user = useAppSelector((state) => state.userRecuder.value);
+  const user = useAppSelector((state) => state.userReducer.value);
   const dispatch = useDispatch<AppDispatch>()
 
   if(user.isAuth){

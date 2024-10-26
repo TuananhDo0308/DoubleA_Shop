@@ -15,7 +15,7 @@ import {
 
 const ProductList: React.FC = () => {
   const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails);
-  const user = useAppSelector((state) => state.userRecuder.value);
+  const user = useAppSelector((state) => state.userReducer.value);
   const dispatch = useDispatch<AppDispatch>();
 
   const vatRate = 0.1; // 10%
