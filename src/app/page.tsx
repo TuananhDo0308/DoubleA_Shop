@@ -25,9 +25,6 @@ export default function Home() {
       <section id="shop">
         <ListProductsPage />
       </section>
-      <section id="carousel">
-        <SwipeCarousel />
-       </section>
       <Footer />
       <section id="cart">
         <Cartbutton />

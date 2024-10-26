@@ -4,7 +4,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { updateProfile } from "@/services/signUpAPI"; // Import API call to update profile
-import { useAuth } from "@/context/AuthContext"; // Import useAuth from AuthContext
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
 import { useDispatch } from "react-redux";

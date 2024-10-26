@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { OrderHistory } from "@/components/OrderHistory"; 
 import { OrderHistory2 } from "@/components/OrderHistoryCompleted"; 
-import { useAuth } from "@/context/AuthContext";
 import DefaultAvatar from "@/assets/avatar-2.png"; 
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";

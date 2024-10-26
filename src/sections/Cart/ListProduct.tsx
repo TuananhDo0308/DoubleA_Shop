@@ -2,7 +2,6 @@ import React from "react";
 import Image from "next/image";
 import { IMG_URL } from "@/services/LinkAPI";
 import { removeItems, updateCart } from "@/services/cartAPI";
-import { useAuth } from "@/context/AuthContext";
 import { AppDispatch, useAppSelector } from "@/app/GlobalRedux/store";
 import { useDispatch } from "react-redux";
 import Link from "next/link";

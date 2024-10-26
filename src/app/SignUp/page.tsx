@@ -7,6 +7,8 @@ import defaultImage from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"; // Impor
 import { registerUser } from "@/services/signUpAPI";
 import Logo from "@/assets/logo.png";
 import { useRouter } from "next/navigation"; // Đổi thành 'next/navigation'
+import Link from "next/link";
+import { link } from "fs";
 
 interface UserFormData {
   firstName: string;
@@ -114,8 +116,8 @@ export default function SignUp () {
         profilePicture: data.profilePicture, // Assuming this is a file object
       };
       
-      //const response = await registerUser(formData); // Assuming registerUser expects FormData (your custom interface)
-      //console.log("Final Data:", response);
+      const response = await registerUser(formData); // Assuming registerUser expects FormData (your custom interface)
+      console.log("Final Data:", response);
       router.push("/"); 
     } catch (error: any) {
       console.error(error);
@@ -133,7 +135,7 @@ export default function SignUp () {
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   return (
-    <div className="relative min-h-screen flex justify-center max-h-full items-center">
+    <div className="relative h-screen flex justify-center items-center">
       {/* Blurred Background */}
       <div
         className="absolute inset-0 bg-cover bg-center filter blur-md"
@@ -145,7 +147,7 @@ export default function SignUp () {
       ></div>
 
       {/* Content Container */}
-      <div className="w-[650px] bg-white flex justify-center items-center shadow-lg h-full py-10 rounded-2xl z-10">
+      <div className="w-[650px] bg-white flex justify-center items-center shadow-lg  py-10 rounded-2xl z-10">
         <div className="w-full max-w-md">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -174,12 +176,15 @@ export default function SignUp () {
                   </button>
                 )}
                 {currentStep === 0 && (
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-gray-300 rounded"
-                  >
-                    Back
-                  </button>
+                  <Link href={"/"}>
+                        <button
+                      type="button"
+                      className="px-4 py-2 bg-gray-300 rounded"
+                    >
+                      Back
+                    </button>
+                  </Link>
+                
                 )}
                 {currentStep === 3 && (
                   <button

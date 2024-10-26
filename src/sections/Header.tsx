@@ -1,5 +1,4 @@
 "use client"
-import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import Image from "next/image";
 import Logo from "@/assets/logo.png";

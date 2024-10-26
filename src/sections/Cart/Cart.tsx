@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Icon from "@/assets/BagIcon.png";
-import { useAuth } from "@/context/AuthContext";
 import { AppDispatch, useAppSelector } from "@/app/GlobalRedux/store";
 import Drawer from "./CartDrawer";
 import { useDispatch } from "react-redux";
