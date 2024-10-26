@@ -1,6 +1,6 @@
 "use client"
 import {configureStore} from '@reduxjs/toolkit'
-import userRecuder from './Features/userSlice'
+import userReducer from './Features/userSlice'
 import loginStatusReducer from './Features/loginUiSlice'
 import productSliceReducer from './Features/productSlice'
 import cartUiStatusSliceReducer from './Features/cartUiSlice'
@@ -13,7 +13,7 @@ import { TypedUseSelectorHook, useSelector } from 'react-redux'
 
 export const store=configureStore({
     reducer:{
-        userRecuder,
+        userReducer,
         loginStatusReducer,
         productSliceReducer,
         cartUiStatusSliceReducer,

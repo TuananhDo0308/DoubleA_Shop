@@ -4,7 +4,6 @@ import "./globals.css";
 import clsx from "clsx";
 import Providers from "./GlobalRedux/provider";
 
-
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -18,13 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Providers>
-      <html lang="en" className="relative">
-        <body className={clsx(dmSans.className, "antialiased bg-[#EAEEFE] m-0 p-0")}>
-          {children}
-        </body>
-      </html>
-    </Providers>
-    
+    <html lang="en" className="relative">
+      <body
+        className={clsx(dmSans.className, "antialiased bg-[#EAEEFE] m-0 p-0")}
+      >
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }

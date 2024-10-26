@@ -36,7 +36,7 @@ export default function CheckoutPage(){
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>()
   const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails); // Select cart from Redux store
-  const user = useAppSelector((state) => state.userRecuder.value); // Select user from Redux store
+  const user = useAppSelector((state) => state.userReducer.value); // Select user from Redux store
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [paymentCost, setPaymentCost] = useState<number>(0);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
