@@ -2,11 +2,13 @@ import React, { useRef, useState } from "react";
 import { ProductType } from "@/types/Product";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
 import { addToCart } from "@/services/cartAPI";
 import SlideInNotifications from "./Message";
 import { IMG_URL } from "@/services/LinkAPI";
-import ProductDetailModal from "./DetailProduct"; // Import the ProductDetailModal component
+import ProductDetailModal from "./DetailProduct"; 
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, useAppSelector } from "@/app/GlobalRedux/store";
+import { addProduct, setProductQuantity } from "@/app/GlobalRedux/Features/userCart"; // Import Redux actions
 
 interface ProductProps {
   product: ProductType;
@@ -18,7 +20,9 @@ interface Notification {
 }
 
 export const Product: React.FC<ProductProps> = ({ product }) => {
-  const { cart, setCart, user } = useAuth();
+  const dispatch = useDispatch<AppDispatch>(); // Use AppDispatch for typed dispatch
+  const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails); // Select cart from Redux
+  const user = useAppSelector((state) => state.userRecuder.value); // Select user info from Redux
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
 
@@ -27,6 +31,7 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
       const productInCart = cart.find(item => item.str_masp === product.str_masp);
       const desiredQuantity = productInCart ? productInCart.i_so_luong + 1 : 1;
 
+      // Kiểm tra số lượng hàng tồn kho
       if (product.i_so_luong < desiredQuantity) {
         setNotifications(prev => [
           { id: Math.random(), message: `Not enough stock for ${product.str_tensp}` },
@@ -35,15 +40,32 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
         return;
       }
 
+      // Chuyển đổi đối tượng `product` sang `CartDetails`
+      const cartItem = {
+        str_mactgh: productInCart ? productInCart.str_mactgh : Math.random().toString(36).substr(2, 9), // ID duy nhất cho mỗi mục trong giỏ hàng
+        str_magh: cart.length > 0 ? cart[0].str_magh : "default-cart-id", // ID của giỏ hàng (tạm thời dùng "default-cart-id")
+        str_masp: product.str_masp, // Mã sản phẩm
+        str_tensp: product.str_tensp, // Tên sản phẩm
+        d_don_gia: product.d_don_gia, // Đơn giá
+        i_so_luong: 1, // Khởi tạo số lượng là 1 nếu thêm sản phẩm mới
+        strimg: product.strimg || "", // Hình ảnh sản phẩm
+      };
+
+      // Thêm sản phẩm vào cơ sở dữ liệu
       await addProductToCartInDB();
 
+      // Thêm sản phẩm vào giỏ hàng
       setNotifications(prev => [
         { id: Math.random(), message: `${product.str_tensp} added to cart` },
         ...prev
       ]);
 
-      const updatedCart = getUpdatedCart();
-      setCart(updatedCart);
+      // Dispatch the action to add or update product in the cart
+      dispatch(
+        productInCart
+          ? setProductQuantity({ str_mactgh: productInCart.str_mactgh, quantity: desiredQuantity })
+          : addProduct(cartItem) // Sử dụng `cartItem` đã chuyển đổi
+      );
     } catch (error) {
       setNotifications(prev => [
         { id: Math.random(), message: 'Error adding product to cart' },
@@ -52,6 +74,8 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     }
   };
 
+
+  // Function to handle adding product to DB
   const addProductToCartInDB = async () => {
     try {
       await addToCart(user.str_mand, product.str_masp);
@@ -63,27 +87,17 @@ export const Product: React.FC<ProductProps> = ({ product }) => {
     }
   };
 
-  const getUpdatedCart = () => {
-    const updatedCart = [...cart];
-    const productInCart = updatedCart.find(item => item.str_masp === product.str_masp);
-
-    if (productInCart) {
-      productInCart.i_so_luong += 1;
-    } else {
-      updatedCart.push({ ...product, i_so_luong: 1 });
-    }
-
-    return updatedCart;
-  };
-
+  // Remove notification after display
   const removeNotif = (id: number) => {
     setNotifications(prevNotifs => prevNotifs.filter(n => n.id !== id));
   };
 
+  // Open product detail modal
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
+  // Close product detail modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };

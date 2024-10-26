@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import { OrderHistory } from "@/components/OrderHistory"; 
 import { OrderHistory2 } from "@/components/OrderHistoryCompleted"; 
@@ -8,51 +9,39 @@ import { IMG_URL } from "@/services/LinkAPI";
 import { FaSignOutAlt } from "react-icons/fa"; 
 import { motion } from "framer-motion";
 import ConfirmDialog from "@/components/ConfirmBox";
-interface UserInfoProps {
-  setShowUserInfo: React.Dispatch<React.SetStateAction<boolean>>;
-  onOpenEditModal: () => void;
-}
+import { AppDispatch, useAppSelector } from "../GlobalRedux/store";
+import { useDispatch } from "react-redux";
+import { logOut } from "../GlobalRedux/Features/userSlice";
+import router from "next/router";
+import { changeStatus } from "../GlobalRedux/Features/userEditUiSlice";
+import UserEditModal from "@/components/UserEditModal";
+import Link from "next/link";
+import { Chip } from "@/components/Chiptabs";
+export default function UserInfo() {
+  const [selectedTab, setSelectedTab] = useState<string>('OrderHistory');
 
-export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoProps) {
-  const { user, signOut } = useAuth(); 
-  const [selectedTab, setSelectedTab] = useState("OrderHistory");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleAction = () => {
-    // Open the dialog before taking action
-    setIsDialogOpen(true);
-  };
-
-  const handleConfirm = () => {
-    // User confirmed the action
-    setIsDialogOpen(false);
-    handleLogout();
-    // Proceed with the action, e.g., place an order, delete an item, etc.
-    console.log("Action confirmed");
-  };
-
-  const handleCancel = () => {
-    // User canceled the action
-    setIsDialogOpen(false);
-  };
+  const dispatch = useDispatch<AppDispatch>()
+  const user = useAppSelector((state) => state.userRecuder.value); // Lấy thông tin người dùng từ Redux
 
 
   const handleLogout = () => {
-    signOut(); 
-    setShowUserInfo(false); 
+    dispatch(logOut()); 
+    router.push("/"); 
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
+        <Link href="/">
         <button
-          onClick={() => setShowUserInfo(false)}
           className="absolute top-4 left-4 z-50 text-xl font-bold text-white mb-8 bg-blue-700 px-5 py-2 rounded-xl hover:bg-blue-500"
         >
           &larr; Back
         </button>
+        </Link>
+       
         <button
-          onClick={handleAction}
+          onClick={handleLogout}
           className="absolute top-5 right-5 z-50"
           type="button"
         >
@@ -107,7 +96,7 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
                   <div className="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
                     <div className="py-6 px-3 mt-32 sm:mt-0">
                       <button
-                        onClick={onOpenEditModal}
+                        onClick={()=>{dispatch(changeStatus())}}
                         className="bg-black hover:bg-gray-800 rounded-md mr-3 font-medium text-lg text-white px-5 py-2"
                         type="button"
                       >
@@ -145,15 +134,17 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
 
                 {/* Tab Navigation for Order History */}
                 <div className="px-36 py-6 flex items-center flex-wrap gap-2 justify-center">
-                  <TabButton
+                  <Chip
                     text="Processing Orders"
                     selected={selectedTab === "OrderHistory"}
-                    onClick={() => setSelectedTab("OrderHistory")}
+                    value="OrderHistory"
+                    setSelectedCategory={setSelectedTab}
                   />
-                  <TabButton
+                  <Chip
                     text="Order History"
                     selected={selectedTab === "OrderHistory2"}
-                    onClick={() => setSelectedTab("OrderHistory2")}
+                    value="OrderHistory2"
+                    setSelectedCategory={setSelectedTab}
                   />
                 </div>
 
@@ -185,42 +176,9 @@ export default function UserInfo({ setShowUserInfo, onOpenEditModal }: UserInfoP
           </div>
         </div>
       </div>
-      <ConfirmDialog
-        isOpen={isDialogOpen}
-        title="Confirm Action"
-        message="Are you sure you want to log out?"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
+
+
+      <UserEditModal/>
     </div>
   );
 }
-
-// Component for individual Tab Button
-interface TabButtonProps {
-  text: string;
-  selected: boolean;
-  onClick: () => void;
-}
-
-const TabButton: React.FC<TabButtonProps> = ({ text, selected, onClick }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`${
-        selected
-          ? "text-white font-black"
-          : "text-slate-800 hover:text-slate-900 hover:bg-slate-300"
-      } text-base transition-colors px-5 py-2 rounded-md relative`}
-    >
-      <span className="relative z-10">{text}</span>
-      {selected && (
-        <motion.span
-          layoutId="pill-tab"
-          transition={{ type: "spring", duration: 0.5 }}
-          className="absolute inset-0 z-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md"
-        />
-      )}
-    </button>
-  );
-};

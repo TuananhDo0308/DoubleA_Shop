@@ -1,15 +1,19 @@
 "use client";
 import "@/app/globals.css";
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
 import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope, FaUser } from "react-icons/fa";
-import { getPayments, placeOrder } from "@/services/checkoutAPI"; // Import API functions
+import { getPayments, placeOrder } from "@/services/checkoutAPI";
 import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { IMG_URL } from "@/services/LinkAPI";
-import ConfirmDialog from "@/components/ConfirmBox"; // Import the ConfirmDialog component
+import ConfirmDialog from "@/components/ConfirmBox"; 
+import { clearCart } from "@/app/GlobalRedux/Features/userCart"; // Import action to clear cart
+import { useDispatch } from "react-redux";
+import { AppDispatch, useAppSelector } from "../GlobalRedux/store";
+import Link from "next/link";
+import router from "next/router";
 
 // Define the form data interface
 interface OrderFormData {
@@ -28,14 +32,12 @@ interface PaymentMethod {
   strimg: string;
 }
 
-export default function CheckoutPage({
-  setShowCheckout,
-}: {
-  setShowCheckout: Dispatch<SetStateAction<boolean>>;
-}) {
+export default function CheckoutPage(){
+  const dispatch = useDispatch<AppDispatch>()
+  const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails); // Select cart from Redux store
+  const user = useAppSelector((state) => state.userRecuder.value); // Select user from Redux store
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [paymentCost, setPaymentCost] = useState<number>(0);
-  const { user, cart, setCart } = useAuth();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -90,7 +92,7 @@ export default function CheckoutPage({
 
   const handlePlaceOrder = async (data: OrderFormData) => {
     const orderData = {
-      userId: user.str_mand, // User ID
+      userId: user.str_mand, // User ID from Redux store
       payId: paymentMethod || "", // Payment ID
       email: data.email,
       name: data.name,
@@ -102,9 +104,9 @@ export default function CheckoutPage({
     try {
       const response = await placeOrder(orderData);
       console.log("Order placed successfully:", response);  
-      setCart([]); // Clear the cart
-  
-      setShowCheckout(false); // Close the checkout page
+      dispatch(clearCart()); // Clear the cart in Redux store after placing order
+      router.push("/"); // Chuyển hướng về trang chính
+
     } catch (error) {
       console.error("Failed to place order:", error);
       alert("Failed to place order. Please try again.");
@@ -127,18 +129,21 @@ export default function CheckoutPage({
     setIsDialogOpen(false);
   };
 
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 w-full flex justify-center items-center">
       <div className="relative w-full h-full bg-white shadow-lg overflow-y-auto">
         <div className="grid sm:px-10 lg:grid-cols-2">
           
               <div className=" pt-8">
+                <Link href={"/"}>
                 <button
-                  onClick={() => setShowCheckout(false)}
                   className=" z-50 text-xl font-bold text-white mb-8 bg-blue-700 px-5 py-2 rounded-xl hover:bg-blue-500"
                 >
                   &larr; Back
                 </button>
+                </Link>
+                
                 <p className="text-2xl font-bold ">Order Summary</p>
                 <p className="text-gray-400">Check your items. And select a suitable payment method.</p>
                 <div className="mt-8 space-y-3 rounded-lg border bg-white px-2 py-4 sm:px-6">

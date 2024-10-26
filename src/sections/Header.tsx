@@ -1,3 +1,4 @@
+"use client"
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import Image from "next/image";
@@ -5,17 +6,13 @@ import Logo from "@/assets/logo.png";
 import DefaultAvatar from "@/assets/avatar-2.png"; // Default avatar path
 import SlideInNotifications from "@/components/Message"; // Import SlideInNotifications
 import { IMG_URL } from "@/services/LinkAPI";
-
-// Define the props types for the Navbar component
-interface NavbarProps {
-  onSignInClick: () => void;
-  onAvatarClick: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ onSignInClick, onAvatarClick }) => {
-  const { user } = useAuth(); // Get the user from AuthContext
-  const [notifications, setNotifications] = useState<{ id: number; message: string }[]>([]);
-
+import { AppDispatch, useAppSelector } from "@/app/GlobalRedux/store";
+import { useDispatch } from "react-redux";
+import { changeStatus } from "@/app/GlobalRedux/Features/loginUiSlice";
+import Link from "next/link";
+export default function Navbar () {
+  const user = useAppSelector((state)=>state.userRecuder.value)
+  const dispatch = useDispatch<AppDispatch>()
   // Function to scroll to a section with smooth behavior
   const handleScrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
@@ -41,33 +38,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onSignInClick, onAvatarClick }) 
 
           {/* Navbar */}
           <nav className="flex gap-6 text-black/60 items-center">
-            <button className="topNav" onClick={() => handleScrollToSection("hero")}>
+            <button className="topNav" >
               Home
             </button>
-            <button className="topNav" onClick={() => handleScrollToSection("about-us")}>
+            <button className="topNav" >
               About Us
             </button>
-            <button className="topNav" onClick={() => handleScrollToSection("shop")}>
+            <button className="topNav" >
               Shop
             </button>
-
-            {/* Conditional Rendering based on user's auth state */}
-            {user ? (
+            {user.isAuth? (
               <div className="flex items-center space-x-2">
-                <button onClick={onAvatarClick} className="focus:outline-none">
-                  <Image
-                    src={user?.strimg ? `${IMG_URL}/${user?.strimg}` : DefaultAvatar.src} // Use user avatar or default avatar
-                    alt="User Avatar"
-                    width={40}
-                    height={40}
-                    className="rounded-full cursor-pointer"
-                  />
-                </button>
+                <Link href="/UserProfile">
+                  <button className="focus:outline-none">
+                    <Image
+                      src={`${IMG_URL}/${user?.strimg}`}
+                      alt="User Avatar"
+                      width={40}
+                      height={40}
+                      className="rounded-full cursor-pointer"
+                    />
+                  </button>
+                </Link>
               </div>
             ) : (
               <button
                 className="bg-black text-white px-4 py-2 rounded-lg font-medium inline-block"
-                onClick={onSignInClick} // Call onSignInClick when clicked
+                onClick={()=>{dispatch(changeStatus())}}
               >
                 Sign In
               </button>

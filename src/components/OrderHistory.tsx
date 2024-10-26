@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getHistory } from "@/services/signUpAPI"; // API to get order history
 import OrderProductList from "@/components/ListProduct"; // Import the new component
+import { useAppSelector } from "@/app/GlobalRedux/store";
 
 interface OrderDetail {
   Product: {
@@ -25,7 +26,7 @@ interface Order {
 }
 
 export const OrderHistory = () => {
-  const { user } = useAuth();
+  const user = useAppSelector((state)=>state.userRecuder.value)
   const [orders, setOrders] = useState<Order[]>([]);
   const [visibleInvoices, setVisibleInvoices] = useState<string[]>([]); // State to manage visible invoices
 

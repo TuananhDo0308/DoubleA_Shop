@@ -29,7 +29,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['8a60-113-161-84-160.ngrok-free.app'], // Thay thế bằng domain ngrok của bạn
+    domains: ['6690-113-161-86-105.ngrok-free.app'], // Thay thế bằng domain ngrok của bạn
   },
   // ...other config
     // output: 'export',

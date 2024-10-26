@@ -1,100 +1,37 @@
-"use client";
 import React, { useState, useEffect } from "react";
-import { Navbar } from "@/sections/Header";
-import { ListProducts } from "@/sections/ListProducts";
+import Navbar from "@/sections/Header";
+import ListProductsPage from "@/sections/ListProducts"; // Import ListProductsPage
 import { Hero } from "@/sections/Hero";
 import { LogoTicker } from "@/sections/LogoTicker";
 import { SwipeCarousel } from "@/sections/Carousel";
 import { TextParallaxContentExample } from "@/sections/AboutUs";
-import { DragCloseDrawerExample } from "@/sections/Cart";
-import { useAuth } from "@/context/AuthContext";
+import Cartbutton from "@/sections/Cart/Cart";
 import SignIn from "@/pages/SignIn";
-import UserInfo from "@/pages/UserInfo";
-import CheckoutPage from "@/pages/Checkout";
+import CheckoutPage from "@/app/Checkout/page";
 import { Footer } from "@/sections/Footer";
-import UserEditModal from "@/pages/UserEditModal"; // Import the modal
-import { getCart } from "@/services/cartAPI";
 
 export default function Home() {
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [showUserInfo, setShowUserInfo] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false); // Add state for edit modal
-
-  const { user, cart, setCart } = useAuth();
-
-  // Fetch cart data on initial load and whenever the user changes (e.g., login)
-  useEffect(() => {
-    if (user) {
-      fetchCart();
-    }
-  }, [user]); // Dependency array includes 'user' to refetch cart on login
-
-  const fetchCart = async () => {
-    try {
-      const response = await getCart(user.str_mand);
-      console.log(response)
-      setCart(response.cart.CartDetails);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-    }
-  };
-
-  const handleAvatarClick = () => {
-    setShowUserInfo(true); // Show UserInfo overlay when avatar is clicked
-  };
-
-  const handleCheckoutClick = () => {
-    setShowCheckout(true); // Show CheckoutPage overlay
-  };
-
-  const handleOpenEditModal = () => {
-    setShowEditModal(true); // Show edit modal
-  };
-
-  const handleCloseEditModal = () => {
-    setShowEditModal(false); // Hide edit modal
-  };
-
   return (
     <div>
-      <Navbar
-        onSignInClick={() => setShowSignIn(true)}
-        onAvatarClick={handleAvatarClick} // Pass the handleAvatarClick function to Navbar
-      />
-      {showUserInfo || showCheckout ? (
-        <>
-          {showUserInfo && <UserInfo setShowUserInfo={setShowUserInfo} onOpenEditModal={handleOpenEditModal} />}
-          {showCheckout && <CheckoutPage setShowCheckout={setShowCheckout} />}
-        </>
-      ) : (
-        <>
-          <section id="hero">
-            <Hero />
-            <LogoTicker />
-          </section>
-          <section id="about-us">
-            <TextParallaxContentExample />
-          </section>
-          <section id="shop">
-            <ListProducts />
-          </section>
-          <section id="carousel">
-            <SwipeCarousel />
-          </section>
-          <section id="cart">
-            <DragCloseDrawerExample onCheckoutClick={handleCheckoutClick} />
-          </section>
-          <Footer />
-        </>
-      )}
-
-      {showSignIn && <SignIn setShowSignIn={setShowSignIn} />}
-      
-      {/* Include the UserEditModal in the layout */}
-      {showEditModal && (
-        <UserEditModal onClose={handleCloseEditModal} />
-      )}
+      <Navbar />
+      <SignIn />
+      <section id="hero">
+        <Hero />
+        <LogoTicker />
+      </section>
+      <section id="about-us">
+        <TextParallaxContentExample />
+      </section>
+      <section id="shop">
+        <ListProductsPage />
+      </section>
+      <section id="carousel">
+        <SwipeCarousel />
+       </section>
+      <Footer />
+      <section id="cart">
+        <Cartbutton />
+      </section>
     </div>
   );
 }
