@@ -29,7 +29,7 @@ const schema = yup.object().shape({
 
 export default function UserEditModal() {
   const dispatch = useDispatch<AppDispatch>()
-  const user = useAppSelector((state) => state.userRecuder.value); // Lấy thông tin người dùng từ Redux
+  const user = useAppSelector((state) => state.userReducer.value); // Lấy thông tin người dùng từ Redux
   const status = useAppSelector((state) => state.userEditUiReducer.value); // Lấy thông tin người dùng từ Redux
 
   const methods = useForm({

@@ -26,7 +26,7 @@ interface Order {
 }
 
 export const OrderHistory2 = () => {
-  const user = useAppSelector((state)=>state.userRecuder.value)
+  const user = useAppSelector((state)=>state.userReducer.value)
   const [orders2, setorders2] = useState<Order[]>([]);
   const [visibleInvoices, setVisibleInvoices] = useState<string[]>([]); // State to manage visible invoices
 

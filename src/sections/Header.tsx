@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import { changeStatus } from "@/app/GlobalRedux/Features/loginUiSlice";
 import Link from "next/link";
 export default function Navbar () {
-  const user = useAppSelector((state)=>state.userRecuder.value)
+  const user = useAppSelector((state)=>state.userReducer.value)
   const dispatch = useDispatch<AppDispatch>()
   // Function to scroll to a section with smooth behavior
   const handleScrollToSection = (sectionId: string) => {

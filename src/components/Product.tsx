@@ -22,7 +22,7 @@ interface Notification {
 export const Product: React.FC<ProductProps> = ({ product }) => {
   const dispatch = useDispatch<AppDispatch>(); // Use AppDispatch for typed dispatch
   const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails); // Select cart from Redux
-  const user = useAppSelector((state) => state.userRecuder.value); // Select user info from Redux
+  const user = useAppSelector((state) => state.userReducer.value); // Select user info from Redux
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
 
