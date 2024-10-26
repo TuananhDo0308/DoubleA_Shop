@@ -13,7 +13,7 @@ import { clearCart } from "@/app/GlobalRedux/Features/userCart"; // Import actio
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "../GlobalRedux/store";
 import Link from "next/link";
-import router from "next/router";
+import { useRouter } from "next/navigation"; // Đổi thành 'next/navigation'
 
 // Define the form data interface
 interface OrderFormData {
@@ -33,6 +33,7 @@ interface PaymentMethod {
 }
 
 export default function CheckoutPage(){
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>()
   const cart = useAppSelector((state) => state.cartSliceReducer.CartDetails); // Select cart from Redux store
   const user = useAppSelector((state) => state.userRecuder.value); // Select user from Redux store

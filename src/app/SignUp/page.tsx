@@ -6,7 +6,7 @@ import Image from "next/image";
 import defaultImage from "@/assets/Farm/Fruit Farm Chaikulngamdee.jpg"; // Import the default image
 import { registerUser } from "@/services/signUpAPI";
 import Logo from "@/assets/logo.png";
-import { useRouter } from "next/router"; // Import useRouter
+import { useRouter } from "next/navigation"; // Đổi thành 'next/navigation'
 
 interface UserFormData {
   firstName: string;

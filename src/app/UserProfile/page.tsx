@@ -12,13 +12,14 @@ import ConfirmDialog from "@/components/ConfirmBox";
 import { AppDispatch, useAppSelector } from "../GlobalRedux/store";
 import { useDispatch } from "react-redux";
 import { logOut } from "../GlobalRedux/Features/userSlice";
-import router from "next/router";
+import { useRouter } from "next/navigation"; // Đổi thành 'next/navigation'
 import { changeStatus } from "../GlobalRedux/Features/userEditUiSlice";
 import UserEditModal from "@/components/UserEditModal";
 import Link from "next/link";
 import { Chip } from "@/components/Chiptabs";
 export default function UserInfo() {
   const [selectedTab, setSelectedTab] = useState<string>('OrderHistory');
+  const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>()
   const user = useAppSelector((state) => state.userRecuder.value); // Lấy thông tin người dùng từ Redux

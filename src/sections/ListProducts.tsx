@@ -8,7 +8,6 @@ import { useState } from "react";
 import {ChipTabs} from "@/components/Chiptabs";
 // Server-side function to fetch data from APIs
 export default async function ListProductsPage() {
-  // Fetch categories and products on the server
   const categoryData = await getCategories();
   const productData = await getProducts();
 
